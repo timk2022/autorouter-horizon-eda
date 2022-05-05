@@ -1,0 +1,11 @@
+{
+    "blocks": {
+        "fb8216ea-0324-4864-8da8-81de2799cbd2": {
+            "block_filename": "top_block.json",
+            "schematic_filename": "top_schematic.json",
+            "symbol_filename": ""
+        }
+    },
+    "top_block": "fb8216ea-0324-4864-8da8-81de2799cbd2",
+    "type": "blocks"
+}

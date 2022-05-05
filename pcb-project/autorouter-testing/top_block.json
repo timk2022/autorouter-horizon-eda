@@ -1,0 +1,135 @@
+{
+    "block_instance_mappings": {},
+    "block_instances": {},
+    "bom_export_settings": {
+        "concrete_parts": {},
+        "csv_settings": {
+            "columns": [
+                "QTY",
+                "MPN",
+                "value",
+                "manufacturer",
+                "refdes"
+            ],
+            "order": "asc",
+            "sort_column": "refdes"
+        },
+        "orderable_MPNs": {},
+        "output_filename": ""
+    },
+    "buses": {},
+    "components": {
+        "05e3ce06-abb3-4c42-ab62-984c60e0a065": {
+            "connections": {
+                "44be7d00-923d-4d8b-abb4-f30ac18b4d8f/88e7a1e4-5d0f-4dba-ba5b-5f41e39451f8": {
+                    "net": "6da02419-235a-4bc2-b1b8-b3df28330564"
+                },
+                "44be7d00-923d-4d8b-abb4-f30ac18b4d8f/b4784524-943e-4aab-bbce-61ecc393947e": {
+                    "net": "4c32ad2c-9417-4c9c-9724-489ffee96d3f"
+                }
+            },
+            "custom_pin_names": {},
+            "entity": "f1d140d8-5265-4c7f-9989-f1c1b2e6f94c",
+            "group": "00000000-0000-0000-0000-000000000000",
+            "part": "2e2dc7aa-fcd3-414a-a00b-ad634d9f00e3",
+            "pin_names": {},
+            "refdes": "D1",
+            "tag": "8cf91472-38ec-4a98-bfc4-b2076d177bc9",
+            "value": ""
+        },
+        "2135c295-e19c-4bbd-837e-6adcf6748118": {
+            "connections": {
+                "48af78e5-730e-44eb-977a-cf188e4fcb39/6a44037c-65e2-4876-9359-42890048841d": {
+                    "net": "de90a74d-2aee-4400-aed4-24e76f0006a7"
+                },
+                "48af78e5-730e-44eb-977a-cf188e4fcb39/dda0ec99-5d70-4fbe-a8db-897542e7554e": {
+                    "net": "6da02419-235a-4bc2-b1b8-b3df28330564"
+                }
+            },
+            "custom_pin_names": {},
+            "entity": "3ce770af-7be0-4f72-b2af-2c8010911aaf",
+            "group": "00000000-0000-0000-0000-000000000000",
+            "part": "aa8ad59e-81d4-45bf-8362-981152a8d982",
+            "pin_names": {},
+            "refdes": "R2",
+            "tag": "7b4eaccd-895b-421f-8f24-26ed5cef9b34",
+            "value": ""
+        },
+        "d44bd07f-c70f-4687-9251-6356d9805ec3": {
+            "connections": {
+                "48af78e5-730e-44eb-977a-cf188e4fcb39/6a44037c-65e2-4876-9359-42890048841d": {
+                    "net": "d63b8f16-67b6-4427-9a88-bfdd6d562d37"
+                },
+                "48af78e5-730e-44eb-977a-cf188e4fcb39/dda0ec99-5d70-4fbe-a8db-897542e7554e": {
+                    "net": "de90a74d-2aee-4400-aed4-24e76f0006a7"
+                }
+            },
+            "custom_pin_names": {},
+            "entity": "3ce770af-7be0-4f72-b2af-2c8010911aaf",
+            "group": "00000000-0000-0000-0000-000000000000",
+            "part": "aa8ad59e-81d4-45bf-8362-981152a8d982",
+            "pin_names": {},
+            "refdes": "R1",
+            "tag": "7b4eaccd-895b-421f-8f24-26ed5cef9b34",
+            "value": ""
+        }
+    },
+    "group_names": {},
+    "name": "Top",
+    "net_class_default": "9871b27a-1ec3-4450-8b2e-c1b7a90624ab",
+    "net_classes": {
+        "9871b27a-1ec3-4450-8b2e-c1b7a90624ab": {
+            "name": "default"
+        }
+    },
+    "nets": {
+        "4c32ad2c-9417-4c9c-9724-489ffee96d3f": {
+            "is_port": false,
+            "is_power": true,
+            "name": "GND",
+            "net_class": "9871b27a-1ec3-4450-8b2e-c1b7a90624ab",
+            "port_direction": "bidirectional",
+            "power_symbol_name_visible": true,
+            "power_symbol_style": "gnd"
+        },
+        "6da02419-235a-4bc2-b1b8-b3df28330564": {
+            "is_port": false,
+            "is_power": false,
+            "name": "NET_TEST",
+            "net_class": "9871b27a-1ec3-4450-8b2e-c1b7a90624ab",
+            "port_direction": "bidirectional",
+            "power_symbol_name_visible": true,
+            "power_symbol_style": "gnd"
+        },
+        "d63b8f16-67b6-4427-9a88-bfdd6d562d37": {
+            "is_port": false,
+            "is_power": true,
+            "name": "3V3",
+            "net_class": "9871b27a-1ec3-4450-8b2e-c1b7a90624ab",
+            "port_direction": "bidirectional",
+            "power_symbol_name_visible": true,
+            "power_symbol_style": "dot"
+        },
+        "de90a74d-2aee-4400-aed4-24e76f0006a7": {
+            "is_port": false,
+            "is_power": false,
+            "name": "",
+            "net_class": "9871b27a-1ec3-4450-8b2e-c1b7a90624ab",
+            "port_direction": "bidirectional",
+            "power_symbol_name_visible": true,
+            "power_symbol_style": "gnd"
+        }
+    },
+    "project_meta": {
+        "author": "tim",
+        "date": "2022-05-04",
+        "project_name": "autorouter-testing",
+        "project_title": "autorouter-testing",
+        "rev": "1"
+    },
+    "tag_names": {
+        "7b4eaccd-895b-421f-8f24-26ed5cef9b34": "0",
+        "8cf91472-38ec-4a98-bfc4-b2076d177bc9": "1"
+    },
+    "uuid": "fb8216ea-0324-4864-8da8-81de2799cbd2"
+}

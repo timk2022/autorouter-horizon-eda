@@ -1,0 +1,254 @@
+{
+    "annotation": {
+        "fill_gaps": true,
+        "ignore_unknown": false,
+        "keep": true,
+        "mode": "sheet_100",
+        "order": "right_down"
+    },
+    "block": "fb8216ea-0324-4864-8da8-81de2799cbd2",
+    "group_tag_visible": false,
+    "name": "",
+    "pdf_export_settings": {
+        "min_line_width": 0,
+        "output_filename": ""
+    },
+    "rules": {
+        "single_pin_net": {
+            "enabled": true,
+            "include_unnamed": true,
+            "order": -1
+        }
+    },
+    "sheets": {
+        "e1f34095-4529-4602-8bbb-6ca688f34ba2": {
+            "arcs": {},
+            "block_symbols": {},
+            "bus_labels": {},
+            "bus_rippers": {},
+            "index": 2,
+            "junctions": {
+                "3d8fdde4-e732-4c53-ad0e-26d7e6e43cca": {
+                    "position": [
+                        -10000000,
+                        7500000
+                    ]
+                },
+                "84af192e-2b46-4bad-a6db-0f281ef50d53": {
+                    "position": [
+                        -10000000,
+                        18750000
+                    ]
+                }
+            },
+            "lines": {},
+            "name": "sheet 2",
+            "net_labels": {
+                "91905ea0-4c6d-4fa8-bb94-d4da459d0d0a": {
+                    "junction": "84af192e-2b46-4bad-a6db-0f281ef50d53",
+                    "offsheet_refs": true,
+                    "orientation": "up",
+                    "show_port": false,
+                    "size": 1500000
+                }
+            },
+            "net_lines": {
+                "301e725c-530a-4bb7-96fd-2814b63aa3b3": {
+                    "from": {
+                        "bus_ripper": null,
+                        "junc": "3d8fdde4-e732-4c53-ad0e-26d7e6e43cca",
+                        "pin": null,
+                        "port": null
+                    },
+                    "to": {
+                        "bus_ripper": null,
+                        "junc": null,
+                        "pin": "c839e8a0-1b37-4634-ad11-701bde68ec83/b4784524-943e-4aab-bbce-61ecc393947e",
+                        "port": null
+                    }
+                },
+                "6c25058e-3d0e-4476-9eed-82e5a06938cb": {
+                    "from": {
+                        "bus_ripper": null,
+                        "junc": "84af192e-2b46-4bad-a6db-0f281ef50d53",
+                        "pin": null,
+                        "port": null
+                    },
+                    "to": {
+                        "bus_ripper": null,
+                        "junc": null,
+                        "pin": "c839e8a0-1b37-4634-ad11-701bde68ec83/88e7a1e4-5d0f-4dba-ba5b-5f41e39451f8",
+                        "port": null
+                    }
+                }
+            },
+            "power_symbols": {
+                "6cd5141d-7572-463a-a2ba-6dac72cfbd5d": {
+                    "junction": "3d8fdde4-e732-4c53-ad0e-26d7e6e43cca",
+                    "mirror": false,
+                    "net": "4c32ad2c-9417-4c9c-9724-489ffee96d3f",
+                    "orientation": "down"
+                }
+            },
+            "symbols": {
+                "c839e8a0-1b37-4634-ad11-701bde68ec83": {
+                    "component": "05e3ce06-abb3-4c42-ab62-984c60e0a065",
+                    "display_all_pads": false,
+                    "display_directions": false,
+                    "expand": 0,
+                    "gate": "44be7d00-923d-4d8b-abb4-f30ac18b4d8f",
+                    "pin_display_mode": "selected_only",
+                    "placement": {
+                        "angle": 16384,
+                        "mirror": false,
+                        "shift": [
+                            -10000000,
+                            12500000
+                        ]
+                    },
+                    "smashed": false,
+                    "symbol": "da599c28-70f0-4b70-a27c-fd994d838c21",
+                    "texts": []
+                }
+            },
+            "texts": {},
+            "title_block_values": {}
+        },
+        "f1826e9d-61a7-48fb-bd61-62617e37a4b2": {
+            "arcs": {},
+            "block_symbols": {},
+            "bus_labels": {},
+            "bus_rippers": {},
+            "index": 1,
+            "junctions": {
+                "5f98fbd2-09d3-4752-aca0-c1dbcc89aad7": {
+                    "position": [
+                        0,
+                        6250000
+                    ]
+                },
+                "892f7355-0285-4979-8a51-ebdbba9319b3": {
+                    "position": [
+                        0,
+                        -13750000
+                    ]
+                }
+            },
+            "lines": {},
+            "name": "First sheet",
+            "net_labels": {
+                "792b27fa-ed59-48b1-84fa-1b213b6fb53d": {
+                    "junction": "892f7355-0285-4979-8a51-ebdbba9319b3",
+                    "offsheet_refs": true,
+                    "orientation": "down",
+                    "show_port": false,
+                    "size": 1500000
+                }
+            },
+            "net_lines": {
+                "4e315aa9-c5da-402b-bea8-4c2e34b4ca10": {
+                    "from": {
+                        "bus_ripper": null,
+                        "junc": null,
+                        "pin": "60fcb462-9726-4ad1-af49-14d8659edb9f/6a44037c-65e2-4876-9359-42890048841d",
+                        "port": null
+                    },
+                    "to": {
+                        "bus_ripper": null,
+                        "junc": "5f98fbd2-09d3-4752-aca0-c1dbcc89aad7",
+                        "pin": null,
+                        "port": null
+                    }
+                },
+                "589be5b3-5a92-435e-ba03-12ef82bce280": {
+                    "from": {
+                        "bus_ripper": null,
+                        "junc": null,
+                        "pin": "6609df13-51fd-437c-bd1a-c464a1577e22/dda0ec99-5d70-4fbe-a8db-897542e7554e",
+                        "port": null
+                    },
+                    "to": {
+                        "bus_ripper": null,
+                        "junc": "892f7355-0285-4979-8a51-ebdbba9319b3",
+                        "pin": null,
+                        "port": null
+                    }
+                },
+                "8873cdcf-bb72-474f-a839-8cb9cb1ade0c": {
+                    "from": {
+                        "bus_ripper": null,
+                        "junc": null,
+                        "pin": "6609df13-51fd-437c-bd1a-c464a1577e22/6a44037c-65e2-4876-9359-42890048841d",
+                        "port": null
+                    },
+                    "to": {
+                        "bus_ripper": null,
+                        "junc": null,
+                        "pin": "60fcb462-9726-4ad1-af49-14d8659edb9f/dda0ec99-5d70-4fbe-a8db-897542e7554e",
+                        "port": null
+                    }
+                }
+            },
+            "power_symbols": {
+                "997cc51d-5796-48aa-9d03-9c8417f8982f": {
+                    "junction": "5f98fbd2-09d3-4752-aca0-c1dbcc89aad7",
+                    "mirror": false,
+                    "net": "d63b8f16-67b6-4427-9a88-bfdd6d562d37",
+                    "orientation": "up"
+                }
+            },
+            "symbols": {
+                "60fcb462-9726-4ad1-af49-14d8659edb9f": {
+                    "component": "d44bd07f-c70f-4687-9251-6356d9805ec3",
+                    "display_all_pads": false,
+                    "display_directions": false,
+                    "expand": 0,
+                    "gate": "48af78e5-730e-44eb-977a-cf188e4fcb39",
+                    "pin_display_mode": "selected_only",
+                    "placement": {
+                        "angle": 49152,
+                        "mirror": false,
+                        "shift": [
+                            0,
+                            0
+                        ]
+                    },
+                    "smashed": false,
+                    "symbol": "e2cde69b-9fa7-4332-ba8f-7e5b3ee8ad73",
+                    "texts": []
+                },
+                "6609df13-51fd-437c-bd1a-c464a1577e22": {
+                    "component": "2135c295-e19c-4bbd-837e-6adcf6748118",
+                    "display_all_pads": false,
+                    "display_directions": false,
+                    "expand": 0,
+                    "gate": "48af78e5-730e-44eb-977a-cf188e4fcb39",
+                    "pin_display_mode": "selected_only",
+                    "placement": {
+                        "angle": 49152,
+                        "mirror": false,
+                        "shift": [
+                            0,
+                            -8750000
+                        ]
+                    },
+                    "smashed": false,
+                    "symbol": "e2cde69b-9fa7-4332-ba8f-7e5b3ee8ad73",
+                    "texts": []
+                }
+            },
+            "texts": {},
+            "title_block_values": {}
+        }
+    },
+    "title_block_values": {
+        "author": "tim",
+        "date": "2022-05-04",
+        "project_name": "autorouter-testing",
+        "project_title": "autorouter-testing",
+        "rev": "1"
+    },
+    "type": "schematic_block",
+    "uuid": "119fc0ad-d3b6-428d-94e6-788e7855e912",
+    "version": 3
+}
