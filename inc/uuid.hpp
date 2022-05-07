@@ -10,6 +10,9 @@
 
 #include <string>
 
+
+
+
 class UUID {
     public:
         UUID();
@@ -54,3 +57,5 @@ class UUID {
     private:
         uuid_t uu;
 };
+
+// static UUID MAX_UUID("ffffffff-ffff-ffff-ffff-ffffffffffff");
