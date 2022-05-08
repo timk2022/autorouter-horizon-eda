@@ -137,6 +137,7 @@ net_group_t * get_all_nets(component_group_t * components){
     
     // allocate nets
     net_group_t * all_nets = (net_group_t *)malloc(sizeof(net_group_t)); 
+    std::cout << sizeof(net_t) *total << std::endl;
     all_nets->nets = (net_t *)malloc(sizeof(net_t)*total);
     all_nets->num_nets = total;
     
