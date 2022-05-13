@@ -10,11 +10,13 @@
 
 // typedef struct Component;
 
+class Component;
+
 struct connection_t{
     UUID gate;
     UUID pin;
     UUID comp_id;
-    // Component * comp_pointer;
+    Component * comp_pointer;
     // unsigned long long gate_pin_hashed;
     UUID net;
     // unsigned long long net_hashed;
@@ -108,7 +110,7 @@ struct net_t {
     UUID net_id;
     UUID net_class_id;
 
-    // std::string * net_name;
+    std::string net_name;
 
     enum net_class_t{default_class};
     net_class_t net_class; 
@@ -120,15 +122,33 @@ struct net_t {
     std::vector<connection_t> linked_conns_arr;
     uint32_t linked_conns_arr_len;
 
+    net_t () {}
+
     net_t (UUID net_id, UUID net_class_id, net_class_t net_class, bool is_power,
             bool is_used, std::vector<connection_t> linked_conns_arr, 
             uint32_t linked_conns_arr_len) :
         net_id(net_id), net_class_id(net_class_id), net_class(net_class), is_power(is_power),
         is_used(is_used), linked_conns_arr(linked_conns_arr) {}
+
+    net_t operator = (const net_t& n) {
+        if (this != &n){
+            net_id = n.net_id;
+            net_class_id = n.net_class_id;
+            net_class = n.net_class;
+
+            net_name = n.net_name;
+
+            is_power = n.is_power;
+            is_used = n.is_used;
+            linked_conns_arr = std::vector<connection_t>(n.linked_conns_arr);
+            linked_conns_arr_len = n.linked_conns_arr_len;
+        }
+        return *this;
+    }
 };
 
 struct net_group_t {
-    net_t * nets;
+    std::vector<net_t> nets;
     uint32_t num_nets;
 };
 

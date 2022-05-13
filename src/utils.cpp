@@ -77,7 +77,6 @@ component_group_t load_top_block(const std::string& filename){
 
     components.j = j;
     // components.comp_arr_len = num_components;
-    std::cout << sizeof(Component) <<std::endl;
     std::vector<Component> comp_arr_init (num_components);
     components.comp_arr = comp_arr_init;
    
@@ -127,62 +126,69 @@ component_group_t load_top_block(const std::string& filename){
     return components;
 }
 
+net_group_t get_all_nets(component_group_t * components){
+    uint32_t num_nets = 0;
+    json json_data = components->j;
+    // get total number of nets
+    for(auto comp = json_data["nets"].begin(); comp != json_data["nets"].end(); comp++){
+        num_nets++;
+    }
 
-// net_group_t * get_all_nets(component_group_t * components){
-//     uint32_t total = 0;
-//     json json_data = components->j;
-//     // get total number of nets
-//     for(auto comp = json_data["nets"].begin(); comp != json_data["nets"].end(); comp++){
-//         total++;
-//     }
-    
-//     // allocate nets
-//     net_group_t * all_nets = (net_group_t *)malloc(sizeof(net_group_t)); 
-//     std::cout << sizeof(net_t) *total << std::endl;
-//     all_nets->nets = (net_t *)malloc(sizeof(net_t)*total);
-//     all_nets->num_nets = total;
-    
-    
-//     uint32_t test = sizeof(net_t)*total;  
-    
-    
-//     UUID uu_tmp;
-//     uint32_t index = 0;
+    net_group_t net_list;
+    net_list.num_nets = num_nets;
+    std::vector<net_t> net_arr_init (num_nets);
+    net_list.nets = net_arr_init;
 
-//     //parse nets 
-//     for(auto comp = json_data["nets"].begin(); comp != json_data["nets"].end(); comp++){
-//         std::string tmp_str = comp.key();
-//         uu_tmp.to_uuid(tmp_str);
-//         all_nets->nets[index].net_id = uu_tmp;
+    net_list.nets = std::vector<net_t> (num_nets);
 
-//         tmp_str = comp.value()["net_class"];
-//         uu_tmp.to_uuid(tmp_str);
-//         all_nets->nets[index].net_class_id = uu_tmp;
+    uint32_t net_index = 0;
+    //parse nets 
+    for(auto comp = json_data["nets"].begin(); comp != json_data["nets"].end(); comp++){
+        net_list.nets[net_index].net_id = str_to_uuid(comp.key());
+        net_list.nets[net_index].net_class_id = str_to_uuid(comp.value()["net_class"]);
+        net_list.nets[net_index].net_name = comp.value()["name"]; 
+        net_list.nets[net_index].is_power = comp.value()["is_power"];        
 
-//         //fixme: segfaulting around here, likely memory allocation error
-//         // tmp_str = comp.value()["name"];
-//         // all_nets->nets[index].net_name = &tmp_str;
-        
-//         all_nets->nets[index].is_power = comp.value()["is_power"];
+        net_index++;
+    }
+    net_index = 0;
 
-//         index++;
-//     }
+    for (uint32_t i = 0; i < net_list.nets.size(); i++){
+        bool net_used = false;
+        uint32_t num_linked_components = 0;
+        for(uint32_t j = 0; j < components->comp_arr.size(); j++){
+            for(uint32_t k = 0; k < components->comp_arr[j].conn_arr.size(); k++){
+                if (components->comp_arr[j].conn_arr[k].net == net_list.nets[i].net_id){
+                    net_used = true;
+                    num_linked_components++;
+                }
+            }
+        }
+        net_list.nets[i].is_used = net_used;
+        net_list.nets[i].linked_conns_arr_len = num_linked_components;
+    }
 
-//     // check which components are linked to given    
-//     for (uint32_t i = 0; i < all_nets->num_nets; i++){
-//         bool net_used = false;
-//         uint32_t num_linked_components = 0;
-//         for(uint32_t j = 0; j < components->num_components; j++){
-//             for(uint32_t k = 0; k < components->components[j].num_connections; k++){
-//                 if (components->components[j].connections[k].net == all_nets->nets[i].net_id){
-//                     net_used = true;
-//                     num_linked_components++;
-//                 }
-//             }
-//         }
-//         all_nets->nets[i].is_used = net_used;
-//         all_nets->nets[i].num_linked_components = num_linked_components;
-//     }
+    for (uint32_t i = 0; i <net_list.nets.size(); i++){
+        std::vector<connection_t> tmp_conn_arr (net_list.nets[i].linked_conns_arr_len);
+        net_list.nets[i].linked_conns_arr = tmp_conn_arr;
+
+        uint32_t linked_index = 0;
+        for(uint32_t j = 0; j < components->comp_arr.size(); j++){
+            for(uint32_t k = 0; k < components->comp_arr[j].conn_arr.size(); k++){
+                if(components->comp_arr[j].conn_arr[k].net == net_list.nets[i].net_id){
+                    
+                }
+            }
+        }
+
+
+    }    
+
+
+
+
+
+}
 
 //     for(uint32_t i = 0; i < all_nets->num_nets; i++){
 //         all_nets->nets[i].linked_components = (Component *)malloc(sizeof(Component)*all_nets->nets[i].num_linked_components);
