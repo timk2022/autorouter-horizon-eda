@@ -59,3 +59,9 @@ UUID::operator bool() const
     static const uuid_t null_uuid = {0};
     return memcmp(uu, null_uuid, sizeof(uu)) != 0;
 }
+
+UUID str_to_uuid(const std::string& str) {
+    UUID uu;
+    uu.to_uuid(str);
+    return uu;
+}

@@ -58,4 +58,6 @@ class UUID {
         uuid_t uu;
 };
 
+UUID str_to_uuid(const std::string& str);
+
 // static UUID MAX_UUID("ffffffff-ffff-ffff-ffff-ffffffffffff");
