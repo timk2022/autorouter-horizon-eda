@@ -22,11 +22,11 @@ using json = nlohmann::json;
 int main(void){
     component_group_t components; 
     components = load_top_block("pcb-project/autorouter-testing/top_block.json");
-    net_group_t * net_groups;
+    net_group_t net_groups;
     net_groups = net_generation(&components);
     
-    print_component_group(&components);
-    
+    // print_component_group(&components);
+    print_net_list(&net_groups); 
 
     
 }

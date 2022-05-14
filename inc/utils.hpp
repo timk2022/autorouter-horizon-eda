@@ -2,7 +2,6 @@
 #include <functional>
 #include <string>
 #include <vector>
-
 #include "uuid.hpp"
 
 // using json library https://github.com/nlohmann/json
@@ -12,6 +11,31 @@
 
 class Component;
 
+
+struct Vec3 {
+  double x,y,z;
+   Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
+   Vec3(const Vec3& v): x(v.x), y(v.y), z(v.z) {}
+   
+   Vec3() {}
+   
+   Vec3 operator + (const Vec3& v) const { return Vec3(x+v.x, y+v.y, z+v.z); }
+   Vec3 operator - (const Vec3& v) const { return Vec3(x-v.x, y-v.y, z-v.z); }
+   Vec3 operator * (float d) const { return Vec3(x*d, y*d, z*d); }
+   Vec3 operator / (float d) const { return Vec3(x/d, y/d, z/d); }
+   Vec3 max(const Vec3& v)
+  { 
+    return Vec3((x>v.x) ? x : v.x,(y>v.y) ? y : v.y,(z>v.z) ? z : v.z);
+  }
+   Vec3 normalize() const {
+    double mg = sqrt(x*x + y*y + z*z);
+    return Vec3(x/mg,y/mg,z/mg);
+  }
+   void print() const {
+    printf("x: %f, y: %f, z: %f\n",x,y,z);
+  }
+};
+
 struct connection_t{
     UUID gate;
     UUID pin;
@@ -19,6 +43,10 @@ struct connection_t{
     Component * comp_pointer;
     // unsigned long long gate_pin_hashed;
     UUID net;
+
+    UUID pad;
+    struct Vec3 pad_offset;
+    double pad_angle;
     // unsigned long long net_hashed;
     // connection_t(UUID gate, UUID pin, UUID comp_id, Component * comp_pointer, UUID net) :
     //     gate(gate), pin(pin), comp_id(comp_id), comp_pointer(comp_pointer), net(net) {}
@@ -29,7 +57,13 @@ struct connection_t{
         gate(c.gate),
         pin(c.pin),
         comp_id(c.comp_id),
-        net(c.net)
+        net(c.net),
+        comp_pointer(c.comp_pointer),
+
+        pad(pad),
+        pad_offset(c.pad_offset),
+        pad_angle(c.pad_angle)        
+
         {}
 
     connection_t operator = (const connection_t& c){
@@ -38,9 +72,14 @@ struct connection_t{
             pin = c.pin;
             comp_id = c.comp_id;
             net = c.net;
+            comp_pointer = c.comp_pointer;
+            pad= c.pad;
         }  
         return *this;
     }
+    // ~connection_t(){
+
+    // }
 };
 
 class Component{
@@ -50,6 +89,9 @@ class Component{
         UUID part_id;
         UUID group;
         UUID tag;
+
+        struct Vec3 pos_offset;
+        double angle;
 
         std::vector<connection_t> conn_arr;
 
@@ -61,9 +103,10 @@ class Component{
             part_id(c.part_id),
             group(c.group),
             tag(c.tag),
-            conn_arr(std::vector<connection_t>(c.conn_arr))
-            {}
-
+            conn_arr(std::vector<connection_t>(c.conn_arr)),
+            pos_offset(pos_offset),
+            angle(angle)
+        {}
 
         Component operator = (const Component& c) {
             if (this != &c){
@@ -73,6 +116,8 @@ class Component{
                 group = c.group;
                 tag = c.tag;
                 conn_arr = std::vector<connection_t>(c.conn_arr);
+                pos_offset = c.pos_offset;
+                angle = c.angle;
             }
             return *this;
         }
@@ -80,7 +125,6 @@ class Component{
         ~Component(){
             conn_arr.clear();
         }
-
 };
 
 struct component_group_t {
@@ -161,5 +205,6 @@ struct net_group_t {
 
 struct component_group_t load_top_block(const std::string& filename);
 void print_component_group(struct component_group_t * component_arr);
+void print_net_list(struct net_group_t * net_list);
 
-net_group_t * net_generation(component_group_t * components);
+net_group_t net_generation(component_group_t * components);

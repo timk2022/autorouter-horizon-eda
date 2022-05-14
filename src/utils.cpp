@@ -67,15 +67,33 @@ void print_component_group(struct component_group_t * component_arr){
     }
 }
 
+void print_net_list(struct net_group_t * net_list){
+    std:: cout << "=================NET LIST DEBUG OUTPUT===================\n";
+    for(uint32_t i = 0; i < net_list->nets.size();i++){
+        std::cout << "================= net number: " << i <<" ===================\n";
+        std::cout << "net id: " << std::string(net_list->nets[i].net_id) << std::endl; 
+        for (uint32_t j = 0; j < net_list->nets[i].linked_conns_arr.size(); j++){
+            std::cout << "----------------- linked component number: " << j << "-------------------\n";   
+            std::cout << "component id: " << std::string(net_list->nets[i].linked_conns_arr[j].comp_id) << std::endl;
+            std::cout << "net id: " << std::string(net_list->nets[i].linked_conns_arr[j].net) << std::endl;
+            std::cout << "gate id: " << std::string(net_list->nets[i].linked_conns_arr[j].gate) << std::endl;
+            std::cout << "pin id: " << std::string(net_list->nets[i].linked_conns_arr[j].pin) << std::endl;
+            
+            std::cout << "part id: " << std::string(net_list->nets[i].linked_conns_arr[j].comp_pointer->part_id) << std::endl;
+
+        }
+    }
+}
+
 
 component_group_t load_top_block(const std::string& filename){
-    json j = json_load(filename);
-    uint32_t num_components = num_components_in_top_block(j);
+    json loaded_json = json_load(filename);
+    uint32_t num_components = num_components_in_top_block(loaded_json);
 
 
     component_group_t components;// = (component_group_t *)malloc(sizeof(component_group_t));
 
-    components.j = j;
+    components.j = loaded_json;
     // components.comp_arr_len = num_components;
     std::vector<Component> comp_arr_init (num_components);
     components.comp_arr = comp_arr_init;
@@ -83,9 +101,9 @@ component_group_t load_top_block(const std::string& filename){
     uint32_t conn_arr_index = 0;
     uint32_t comp_arr_index = 0;
 
-    for(auto comp = j["components"].begin(); comp != j["components"].end(); comp++){
+    for(auto comp = loaded_json["components"].begin(); comp != loaded_json["components"].end(); comp++){
         std::string component_id = comp.key();
-        uint32_t num_connections = num_conns_in_comp_top_block(j,component_id);
+        uint32_t num_connections = num_conns_in_comp_top_block(loaded_json,component_id);
 
         Component new_comp;
 
@@ -100,8 +118,10 @@ component_group_t load_top_block(const std::string& filename){
 
         new_comp.conn_arr = new_conn_arr;
         conn_arr_index = 0;
-        for (auto conn = j["components"][component_id]["connections"].begin(); 
-                  conn != j["components"][component_id]["connections"].end(); conn++){
+
+        // populate components
+        for (auto conn = loaded_json["components"][component_id]["connections"].begin(); 
+                  conn != loaded_json["components"][component_id]["connections"].end(); conn++){
             
             connection_t conn_tmp;
             
@@ -115,18 +135,26 @@ component_group_t load_top_block(const std::string& filename){
             conn_tmp.net = str_to_uuid(conn.value()["net"]);            
 
             conn_tmp.comp_id = new_comp.component_id;
-            // conn_tmp.comp_pointer = &(components.comp_arr.back()); 
+            conn_tmp.comp_pointer = &(components.comp_arr[comp_arr_index]); 
 
 
 
             new_comp.conn_arr[conn_arr_index++] = conn_tmp;
         }
         components.comp_arr[comp_arr_index++] = new_comp;
+
+        
+    }
+    // get component pointers
+    for (uint32_t i = 0; i <components.comp_arr.size(); i++){
+        for (uint32_t j = 0; j < components.comp_arr[i].conn_arr.size(); j++){
+            components.comp_arr[i].conn_arr[j].comp_pointer = &(components.comp_arr[i]);
+        }
     }
     return components;
 }
 
-net_group_t get_all_nets(component_group_t * components){
+net_group_t net_generation(component_group_t * components){
     uint32_t num_nets = 0;
     json json_data = components->j;
     // get total number of nets
@@ -153,6 +181,8 @@ net_group_t get_all_nets(component_group_t * components){
     }
     net_index = 0;
 
+
+    // count number of linked components for memory allocation
     for (uint32_t i = 0; i < net_list.nets.size(); i++){
         bool net_used = false;
         uint32_t num_linked_components = 0;
@@ -168,6 +198,7 @@ net_group_t get_all_nets(component_group_t * components){
         net_list.nets[i].linked_conns_arr_len = num_linked_components;
     }
 
+    // start populating nets
     for (uint32_t i = 0; i <net_list.nets.size(); i++){
         std::vector<connection_t> tmp_conn_arr (net_list.nets[i].linked_conns_arr_len);
         net_list.nets[i].linked_conns_arr = tmp_conn_arr;
@@ -176,6 +207,8 @@ net_group_t get_all_nets(component_group_t * components){
         for(uint32_t j = 0; j < components->comp_arr.size(); j++){
             for(uint32_t k = 0; k < components->comp_arr[j].conn_arr.size(); k++){
                 if(components->comp_arr[j].conn_arr[k].net == net_list.nets[i].net_id){
+                    net_list.nets[i].linked_conns_arr[linked_index++] = components->comp_arr[j].conn_arr[k]; 
+                    // net_list.nets[i].linked_conns_arr[linked_index++].comp_id = components->comp_arr[j].conn_arr[k].comp_id; 
                     
                 }
             }
@@ -184,53 +217,33 @@ net_group_t get_all_nets(component_group_t * components){
 
     }    
 
+    std::string pool_base_path = "pcb-project/autorouter-testing/pool/";
+
+    // get pad offsets
+    for (uint32_t i = 0; i < net_list.nets.size(); i++){
+        for (uint32_t j = 0; j < net_list.nets[i].linked_conns_arr.size(); j++){
+
+            std::string part_filename = pool_base_path + "/parts/cache/" + 
+                std::string(net_list.nets[i].linked_conns_arr[j].comp_pointer->part_id) 
+                + "/package.json";
+            
+            json part_file = json_load(part_filename);
+
+            UUID package_id = str_to_uuid(part_file["package"]); 
+
+
+            std::string package_filename = pool_base_path + "/packages/cache/" + 
+                std::string(net_list.nets[i].linked_conns_arr[j].comp_pointer->part_id) 
+                + "/package.json";
+            
+            json package_file = json_load(part_filename);
+
+
+        }
+    }
 
 
 
 
-}
-
-//     for(uint32_t i = 0; i < all_nets->num_nets; i++){
-//         all_nets->nets[i].linked_components = (Component *)malloc(sizeof(Component)*all_nets->nets[i].num_linked_components);
-//         uint32_t linked_index = 0;
-//         for(uint32_t j = 0; j < components->num_components; j++){
-//             for(uint32_t k = 0; k < components->components[j].num_connections; k++){
-//                 if (components->components[j].connections[k].net == all_nets->nets[i].net_id){
-//                     std::copy(
-//                         &(components->components[j]),
-//                         &(components->components[j]) + sizeof(Component),
-//                         &(all_nets->nets[i].linked_components[linked_index])
-//                     );
-//                     all_nets->nets[i].linked_components[linked_index].num_connections = 0;
-//                     std::copy(
-//                         &(components->components[j].connections[k]),
-//                         &(components->components[j].connections[k]) + sizeof(Component::connection),
-//                         &(all_nets->nets[i].linked_components[linked_index].connections[0])
-//                     );
-//                     linked_index++;
-//                 }
-//             }
-//         }
-//     }
-//     return all_nets;
-// }
-
-
-net_group_t * net_generation(component_group_t * components){
-
-
-    // net_group_t * nets = (net_group_t *)malloc(sizeof(net_group_t));
-    // net_group_t * all_nets = get_all_nets(components); 
-
-
-
-    // for (uint32_t i = 0; i<all_nets->num_nets; i++ ){
-    //     // check if net is used
-    //     // if (all_nets.nets[i].is_used){
-    //     //     for (uint32_t j = 0; j < components->num_components)
-    //     // }        
-    // }
-
-
-
+    return net_list;
 }
