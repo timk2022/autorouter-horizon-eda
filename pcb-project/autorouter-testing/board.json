@@ -97,6 +97,13 @@
     "lines": {},
     "n_inner_layers": 0,
     "name": "",
+    "odb_output_settings": {
+        "format": "tgz",
+        "job_name": "",
+        "output_directory": "",
+        "output_filename": ""
+    },
+    "output_format": "gerber",
     "packages": {
         "6f69bf02-580a-4a8c-aedf-591819f951ce": {
             "component": "05e3ce06-abb3-4c42-ab62-984c60e0a065",
@@ -107,8 +114,8 @@
                 "angle": 0,
                 "mirror": false,
                 "shift": [
-                    0,
-                    0
+                    2000000,
+                    1000000
                 ]
             },
             "smashed": false,
@@ -368,6 +375,13 @@
                     {
                         "clearance": 100000,
                         "types": [
+                            "other",
+                            "net_tie"
+                        ]
+                    },
+                    {
+                        "clearance": 100000,
+                        "types": [
                             "track",
                             "track"
                         ]
@@ -431,6 +445,13 @@
                     {
                         "clearance": 100000,
                         "types": [
+                            "track",
+                            "net_tie"
+                        ]
+                    },
+                    {
+                        "clearance": 100000,
+                        "types": [
                             "pad",
                             "pad"
                         ]
@@ -487,6 +508,13 @@
                     {
                         "clearance": 100000,
                         "types": [
+                            "pad",
+                            "net_tie"
+                        ]
+                    },
+                    {
+                        "clearance": 100000,
+                        "types": [
                             "pad_th",
                             "pad_th"
                         ]
@@ -536,6 +564,13 @@
                     {
                         "clearance": 100000,
                         "types": [
+                            "pad_th",
+                            "net_tie"
+                        ]
+                    },
+                    {
+                        "clearance": 100000,
+                        "types": [
                             "via",
                             "via"
                         ]
@@ -578,6 +613,13 @@
                     {
                         "clearance": 100000,
                         "types": [
+                            "via",
+                            "net_tie"
+                        ]
+                    },
+                    {
+                        "clearance": 100000,
+                        "types": [
                             "plane",
                             "plane"
                         ]
@@ -613,6 +655,13 @@
                     {
                         "clearance": 100000,
                         "types": [
+                            "plane",
+                            "net_tie"
+                        ]
+                    },
+                    {
+                        "clearance": 100000,
+                        "types": [
                             "hole_pth",
                             "hole_pth"
                         ]
@@ -641,6 +690,13 @@
                     {
                         "clearance": 100000,
                         "types": [
+                            "hole_pth",
+                            "net_tie"
+                        ]
+                    },
+                    {
+                        "clearance": 100000,
+                        "types": [
                             "hole_npth",
                             "hole_npth"
                         ]
@@ -662,6 +718,13 @@
                     {
                         "clearance": 100000,
                         "types": [
+                            "hole_npth",
+                            "net_tie"
+                        ]
+                    },
+                    {
+                        "clearance": 100000,
+                        "types": [
                             "board_edge",
                             "board_edge"
                         ]
@@ -676,8 +739,29 @@
                     {
                         "clearance": 100000,
                         "types": [
+                            "board_edge",
+                            "net_tie"
+                        ]
+                    },
+                    {
+                        "clearance": 100000,
+                        "types": [
                             "text",
                             "text"
+                        ]
+                    },
+                    {
+                        "clearance": 100000,
+                        "types": [
+                            "text",
+                            "net_tie"
+                        ]
+                    },
+                    {
+                        "clearance": 100000,
+                        "types": [
+                            "net_tie",
+                            "net_tie"
                         ]
                     }
                 ],
@@ -780,6 +864,7 @@
                 },
                 "order": 0,
                 "settings": {
+                    "angle": 0,
                     "connect_style": "solid",
                     "fill_style": "solid",
                     "hatch_border_width": 500000,
@@ -787,6 +872,7 @@
                     "hatch_line_width": 200000,
                     "keep_orphans": false,
                     "min_width": 200000,
+                    "n_spokes": 4,
                     "style": "round",
                     "text_style": "expand",
                     "thermal_gap_width": 200000,
@@ -795,6 +881,7 @@
             }
         },
         "shorted_pads": {},
+        "thermals": {},
         "track_width": {
             "c07573ce-cfdb-4ab4-874b-102907d0459b": {
                 "enabled": true,
@@ -840,6 +927,6 @@
     "tracks": {},
     "type": "board",
     "uuid": "8781c5f8-84df-4b9d-bc0d-ca973a15a12f",
-    "version": 7,
+    "version": 14,
     "vias": {}
 }

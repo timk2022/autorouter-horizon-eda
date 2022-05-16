@@ -94,6 +94,7 @@ class Component{
         UUID group;
         UUID tag;
 
+        bool mirrored;        
         struct Vec3 pos_offset;
         double angle;
 
@@ -109,7 +110,8 @@ class Component{
             tag(c.tag),
             conn_arr(std::vector<connection_t>(c.conn_arr)),
             pos_offset(pos_offset),
-            angle(angle)
+            angle(angle),
+            mirrored(mirrored)
         {}
 
         Component operator = (const Component& c) {
@@ -122,6 +124,7 @@ class Component{
                 conn_arr = std::vector<connection_t>(c.conn_arr);
                 pos_offset = c.pos_offset;
                 angle = c.angle;
+                mirrored = c.mirrored;
             }
             return *this;
         }
@@ -212,3 +215,4 @@ void print_component_group(struct component_group_t * component_arr);
 void print_net_list(struct net_group_t * net_list);
 
 net_group_t net_generation(component_group_t * components);
+void board_load_and_parse(component_group_t * comp_group, const std::string& filename);

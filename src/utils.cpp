@@ -53,6 +53,9 @@ void print_component_group(struct component_group_t * component_arr){
     for (int i = 0; i < component_arr->comp_arr.size(); i++){
         std:: cout << "================= component number: " << i <<" ===================\n";
         std::cout << "component id: " << std::string(component_arr->comp_arr[i].component_id) << std::endl;
+        component_arr->comp_arr[i].pos_offset.print();
+        std::cout << "component angle: " << component_arr->comp_arr[i].angle << std::endl;
+        std::cout << std::endl;
         std::cout << "part id: " << std::string(component_arr->comp_arr[i].part_id) << std::endl;
         std::cout << "entity id: " << std::string(component_arr->comp_arr[i].entity_id) << std::endl;
         std::cout << "group id: " << std::string(component_arr->comp_arr[i].group) << std::endl;
@@ -87,6 +90,8 @@ void print_net_list(struct net_group_t * net_list){
         }
     }
 }
+
+
 
 
 component_group_t load_top_block(const std::string& filename){
@@ -220,6 +225,7 @@ net_group_t net_generation(component_group_t * components){
 
     }    
 
+    // TODO: make this more portable
     std::string pool_base_path = "pcb-project/autorouter-testing/pool";
 
     // get pad offsets
@@ -275,8 +281,25 @@ net_group_t net_generation(component_group_t * components){
         }
     }
 
-
-
-
     return net_list;
+}
+
+void board_load_and_parse(component_group_t * comp_group, const std::string& filename){
+    json board_file = json_load(filename);
+
+    for(auto comp = board_file["packages"].begin(); comp != board_file["packages"].end(); comp++){
+        for (uint32_t i = 0; i < comp_group->comp_arr.size(); i++){
+            // std::cout << comp.key() << std::endl;
+            if (comp_group->comp_arr[i].component_id == str_to_uuid(comp.value()["component"])){
+                comp_group->comp_arr[i].pos_offset.x = comp.value()["placement"]["shift"][0];
+                comp_group->comp_arr[i].pos_offset.y = comp.value()["placement"]["shift"][1];
+                comp_group->comp_arr[i].pos_offset.z = 0;
+                comp_group->comp_arr[i].angle = comp.value()["placement"]["angle"]; 
+                comp_group->comp_arr[i].mirrored = comp.value()["placement"]["mirror"]; 
+                break;
+            }
+        }
+    }
+
+
 }
