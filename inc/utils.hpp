@@ -45,6 +45,7 @@ struct connection_t{
     UUID net;
 
     UUID pad;
+    UUID package_id;
     struct Vec3 pad_offset;
     double pad_angle;
     // unsigned long long net_hashed;
@@ -60,7 +61,9 @@ struct connection_t{
         net(c.net),
         comp_pointer(c.comp_pointer),
 
-        pad(pad),
+        package_id(package_id),
+
+        pad(c.pad),
         pad_offset(c.pad_offset),
         pad_angle(c.pad_angle)        
 
@@ -73,7 +76,8 @@ struct connection_t{
             comp_id = c.comp_id;
             net = c.net;
             comp_pointer = c.comp_pointer;
-            pad= c.pad;
+            pad = c.pad;
+            package_id= c.package_id;
         }  
         return *this;
     }

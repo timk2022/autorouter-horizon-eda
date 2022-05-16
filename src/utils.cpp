@@ -78,9 +78,12 @@ void print_net_list(struct net_group_t * net_list){
             std::cout << "net id: " << std::string(net_list->nets[i].linked_conns_arr[j].net) << std::endl;
             std::cout << "gate id: " << std::string(net_list->nets[i].linked_conns_arr[j].gate) << std::endl;
             std::cout << "pin id: " << std::string(net_list->nets[i].linked_conns_arr[j].pin) << std::endl;
-            
+            std::cout << "package id: " << std::string(net_list->nets[i].linked_conns_arr[j].package_id) <<std::endl;
+            std::cout << "pad id: " << std::string(net_list->nets[i].linked_conns_arr[j].pad) <<std::endl;
             std::cout << "part id: " << std::string(net_list->nets[i].linked_conns_arr[j].comp_pointer->part_id) << std::endl;
-
+            
+            std::cout << "pad angle: " << net_list->nets[i].linked_conns_arr[j].pad_angle << std::endl;
+            net_list->nets[i].linked_conns_arr[j].pad_offset.print();
         }
     }
 }
@@ -217,7 +220,7 @@ net_group_t net_generation(component_group_t * components){
 
     }    
 
-    std::string pool_base_path = "pcb-project/autorouter-testing/pool/";
+    std::string pool_base_path = "pcb-project/autorouter-testing/pool";
 
     // get pad offsets
     for (uint32_t i = 0; i < net_list.nets.size(); i++){
@@ -225,19 +228,49 @@ net_group_t net_generation(component_group_t * components){
 
             std::string part_filename = pool_base_path + "/parts/cache/" + 
                 std::string(net_list.nets[i].linked_conns_arr[j].comp_pointer->part_id) 
-                + "/package.json";
+                + ".json";
             
             json part_file = json_load(part_filename);
 
-            UUID package_id = str_to_uuid(part_file["package"]); 
+            std::string package_id_str;
+            if (part_file.contains("base")){
+                std::string base_part_id = part_file["base"];
 
+                std::string base_part_filename = pool_base_path + "/parts/cache/" + base_part_id + ".json";
+                part_file = json_load(base_part_filename);
+
+            }
+
+            for (auto pad_map = part_file["pad_map"].begin(); pad_map != part_file["pad_map"].end(); pad_map++){
+                if(net_list.nets[i].linked_conns_arr[j].gate == str_to_uuid(pad_map.value()["gate"]) &&
+                   net_list.nets[i].linked_conns_arr[j].pin == str_to_uuid(pad_map.value()["pin"])){
+                    net_list.nets[i].linked_conns_arr[j].pad = str_to_uuid(pad_map.key());
+                    break;
+                }
+
+            }
+            
+            package_id_str = std::string(part_file["package"]);
+
+            UUID package_id = str_to_uuid(package_id_str); 
+            net_list.nets[i].linked_conns_arr[j].package_id = package_id;
 
             std::string package_filename = pool_base_path + "/packages/cache/" + 
-                std::string(net_list.nets[i].linked_conns_arr[j].comp_pointer->part_id) 
+                package_id_str 
                 + "/package.json";
             
-            json package_file = json_load(part_filename);
+            json package_file = json_load(package_filename);
 
+            for (auto pad = package_file["pads"].begin(); pad != package_file["pads"].end(); pad++){
+                if(net_list.nets[i].linked_conns_arr[j].pad == str_to_uuid(pad.key())){
+
+                    net_list.nets[i].linked_conns_arr[j].pad_angle = (double)pad.value()["placement"]["angle"];
+                    net_list.nets[i].linked_conns_arr[j].pad_offset.x = (double)pad.value()["placement"]["shift"][0];
+                    net_list.nets[i].linked_conns_arr[j].pad_offset.y = (double)pad.value()["placement"]["shift"][1];
+                    net_list.nets[i].linked_conns_arr[j].pad_offset.z = 0; 
+                    break;
+                }
+            }
 
         }
     }
