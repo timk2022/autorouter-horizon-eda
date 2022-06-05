@@ -94,17 +94,16 @@ void print_net_list(struct net_group_t * net_list){
 
 
 
-component_group_t load_top_block(const std::string& filename){
+component_group_t * load_top_block(const std::string& filename){
     json loaded_json = json_load(filename);
     uint32_t num_components = num_components_in_top_block(loaded_json);
 
 
-    component_group_t components;// = (component_group_t *)malloc(sizeof(component_group_t));
+    component_group_t * components = new component_group_t;// = (component_group_t *)malloc(sizeof(component_group_t));
 
-    components.j = loaded_json;
+    components->j = loaded_json;
     // components.comp_arr_len = num_components;
-    std::vector<Component> comp_arr_init (num_components);
-    components.comp_arr = comp_arr_init;
+    components->comp_arr.reserve(num_components);
    
     uint32_t conn_arr_index = 0;
     uint32_t comp_arr_index = 0;
@@ -118,13 +117,12 @@ component_group_t load_top_block(const std::string& filename){
 
         new_comp.component_id = str_to_uuid(component_id);        
         new_comp.entity_id = str_to_uuid(comp.value()["entity"]);
-        new_comp.part_id = str_to_uuid(comp.value()["part"]);
+        new_comp.part_id = str_to_uuid(comp.value()["part"]);\
         new_comp.group = str_to_uuid(comp.value()["group"]);
         new_comp.tag = str_to_uuid(comp.value()["tag"]); 
 
-        std::vector<connection_t> new_conn_arr(num_connections);
 
-        new_comp.conn_arr = new_conn_arr;
+        new_comp.conn_arr.reserve(num_connections); //= new_conn_arr;
         conn_arr_index = 0;
 
         // populate components
@@ -136,33 +134,34 @@ component_group_t load_top_block(const std::string& filename){
             std::string gate_uuid_str;
             gate_uuid_str = conn.key().substr(0,conn.key().find("/"));
             std::string pin_uuid_str;
-            pin_uuid_str = conn.key().substr(conn.key().find("/")+1);
+            pin_uuid_str = conn.key().substr(conn.key().find("/" )+1);
             
             conn_tmp.gate = str_to_uuid(gate_uuid_str);
             conn_tmp.pin = str_to_uuid(pin_uuid_str);
             conn_tmp.net = str_to_uuid(conn.value()["net"]);            
 
             conn_tmp.comp_id = new_comp.component_id;
-            conn_tmp.comp_pointer = &(components.comp_arr[comp_arr_index]); 
+            conn_tmp.comp_pointer = &(components->comp_arr[comp_arr_index]); 
 
 
 
-            new_comp.conn_arr[conn_arr_index++] = conn_tmp;
+            new_comp.conn_arr.push_back(conn_tmp);
         }
-        components.comp_arr[comp_arr_index++] = new_comp;
+        components->comp_arr.push_back(new_comp);
+        
 
         
     }
     // get component pointers
-    for (uint32_t i = 0; i <components.comp_arr.size(); i++){
-        for (uint32_t j = 0; j < components.comp_arr[i].conn_arr.size(); j++){
-            components.comp_arr[i].conn_arr[j].comp_pointer = &(components.comp_arr[i]);
+    for (auto i = 0; i <components->comp_arr.size(); i++){
+        for (auto j = 0; j < components->comp_arr[i].conn_arr.size(); j++){
+            components->comp_arr[i].conn_arr[j].comp_pointer = &(components->comp_arr[i]);
         }
     }
     return components;
 }
 
-net_group_t net_generation(component_group_t * components){
+net_group_t * net_generation(component_group_t * components){
     uint32_t num_nets = 0;
     json json_data = components->j;
     // get total number of nets
@@ -170,53 +169,48 @@ net_group_t net_generation(component_group_t * components){
         num_nets++;
     }
 
-    net_group_t net_list;
-    net_list.num_nets = num_nets;
-    std::vector<net_t> net_arr_init (num_nets);
-    net_list.nets = net_arr_init;
+    net_group_t * net_list = new net_group_t;
+    net_list->num_nets = num_nets;
+    net_list->nets.reserve(num_nets);
 
-    net_list.nets = std::vector<net_t> (num_nets);
 
-    uint32_t net_index = 0;
     //parse nets 
     for(auto comp = json_data["nets"].begin(); comp != json_data["nets"].end(); comp++){
-        net_list.nets[net_index].net_id = str_to_uuid(comp.key());
-        net_list.nets[net_index].net_class_id = str_to_uuid(comp.value()["net_class"]);
-        net_list.nets[net_index].net_name = comp.value()["name"]; 
-        net_list.nets[net_index].is_power = comp.value()["is_power"];        
-
-        net_index++;
+        net_t tmp_net;
+        tmp_net.net_id = str_to_uuid(comp.key());
+        tmp_net.net_class_id = str_to_uuid(comp.value()["net_class"]);
+        tmp_net.net_name = comp.value()["name"]; 
+        tmp_net.is_power = comp.value()["is_power"];        
+        net_list->nets.push_back(tmp_net);
     }
-    net_index = 0;
 
 
     // count number of linked components for memory allocation
-    for (uint32_t i = 0; i < net_list.nets.size(); i++){
-        bool net_used = false;
+    for (auto i = 0; i < net_list->nets.size(); i++){
         uint32_t num_linked_components = 0;
-        for(uint32_t j = 0; j < components->comp_arr.size(); j++){
-            for(uint32_t k = 0; k < components->comp_arr[j].conn_arr.size(); k++){
-                if (components->comp_arr[j].conn_arr[k].net == net_list.nets[i].net_id){
-                    net_used = true;
+        net_list->nets[i].is_used = false;
+        for(auto j = 0; j < components->comp_arr.size(); j++){
+            for(auto k = 0; k < components->comp_arr[j].conn_arr.size(); k++){
+                if (components->comp_arr[j].conn_arr[k].net == net_list->nets[i].net_id){
+                    net_list->nets[i].is_used = true;
                     num_linked_components++;
                 }
             }
         }
-        net_list.nets[i].is_used = net_used;
-        net_list.nets[i].linked_conns_arr_len = num_linked_components;
+        net_list->nets[i].linked_conns_arr_len = num_linked_components;
     }
 
     // start populating nets
-    for (uint32_t i = 0; i <net_list.nets.size(); i++){
-        std::vector<connection_t> tmp_conn_arr (net_list.nets[i].linked_conns_arr_len);
-        net_list.nets[i].linked_conns_arr = tmp_conn_arr;
+    for (auto i = 0; i <net_list->nets.size(); i++){
+        net_list->nets[i].linked_conns_arr.reserve(net_list->nets[i].linked_conns_arr_len);
 
         uint32_t linked_index = 0;
         for(uint32_t j = 0; j < components->comp_arr.size(); j++){
             for(uint32_t k = 0; k < components->comp_arr[j].conn_arr.size(); k++){
-                if(components->comp_arr[j].conn_arr[k].net == net_list.nets[i].net_id){
-                    net_list.nets[i].linked_conns_arr[linked_index++] = components->comp_arr[j].conn_arr[k]; 
-                    // net_list.nets[i].linked_conns_arr[linked_index++].comp_id = components->comp_arr[j].conn_arr[k].comp_id; 
+                if(components->comp_arr[j].conn_arr[k].net == net_list->nets[i].net_id){
+                    // net_list->nets[i].linked_conns_arr[linked_index++] = components->comp_arr[j].conn_arr[k]; 
+                    net_list->nets[i].linked_conns_arr.push_back(components->comp_arr[j].conn_arr[k]); 
+                    // net_list->nets[i].linked_conns_arr[linked_index++].comp_id = components->comp_arr[j].conn_arr[k].comp_id; 
                     
                 }
             }
@@ -229,28 +223,37 @@ net_group_t net_generation(component_group_t * components){
     std::string pool_base_path = "pcb-project/autorouter-testing/pool";
 
     // get pad offsets
-    for (uint32_t i = 0; i < net_list.nets.size(); i++){
-        for (uint32_t j = 0; j < net_list.nets[i].linked_conns_arr.size(); j++){
+    for (auto i = 0; i < net_list->nets.size(); i++){
+        for (auto j = 0; j < net_list->nets[i].linked_conns_arr.size(); j++){
 
             std::string part_filename = pool_base_path + "/parts/cache/" + 
-                std::string(net_list.nets[i].linked_conns_arr[j].comp_pointer->part_id) 
+                std::string(net_list->nets[i].linked_conns_arr[j].comp_pointer->part_id) 
                 + ".json";
             
             json part_file = json_load(part_filename);
+            
+            if (part_file.size() == 0){
+                std::cout << part_filename << std::endl;
+
+                break;
+            }
 
             std::string package_id_str;
-            if (part_file.contains("base")){
+            if (part_file.contains("base") && !part_file.contains("package")){
                 std::string base_part_id = part_file["base"];
 
                 std::string base_part_filename = pool_base_path + "/parts/cache/" + base_part_id + ".json";
-                part_file = json_load(base_part_filename);
+                // delete &part_file;
+                
+                json tmp_part_file = json_load(base_part_filename);
+                part_file = tmp_part_file;//json_load(base_part_filename);
 
             }
 
             for (auto pad_map = part_file["pad_map"].begin(); pad_map != part_file["pad_map"].end(); pad_map++){
-                if(net_list.nets[i].linked_conns_arr[j].gate == str_to_uuid(pad_map.value()["gate"]) &&
-                   net_list.nets[i].linked_conns_arr[j].pin == str_to_uuid(pad_map.value()["pin"])){
-                    net_list.nets[i].linked_conns_arr[j].pad = str_to_uuid(pad_map.key());
+                if(net_list->nets[i].linked_conns_arr[j].gate == str_to_uuid(pad_map.value()["gate"]) &&
+                   net_list->nets[i].linked_conns_arr[j].pin == str_to_uuid(pad_map.value()["pin"])){
+                    net_list->nets[i].linked_conns_arr[j].pad = str_to_uuid(pad_map.key());
                     break;
                 }
 
@@ -259,7 +262,7 @@ net_group_t net_generation(component_group_t * components){
             package_id_str = std::string(part_file["package"]);
 
             UUID package_id = str_to_uuid(package_id_str); 
-            net_list.nets[i].linked_conns_arr[j].package_id = package_id;
+            net_list->nets[i].linked_conns_arr[j].package_id = package_id;
 
             std::string package_filename = pool_base_path + "/packages/cache/" + 
                 package_id_str 
@@ -268,16 +271,15 @@ net_group_t net_generation(component_group_t * components){
             json package_file = json_load(package_filename);
 
             for (auto pad = package_file["pads"].begin(); pad != package_file["pads"].end(); pad++){
-                if(net_list.nets[i].linked_conns_arr[j].pad == str_to_uuid(pad.key())){
+                if(net_list->nets[i].linked_conns_arr[j].pad == str_to_uuid(pad.key())){
 
-                    net_list.nets[i].linked_conns_arr[j].pad_angle = (double)pad.value()["placement"]["angle"];
-                    net_list.nets[i].linked_conns_arr[j].pad_offset.x = (double)pad.value()["placement"]["shift"][0];
-                    net_list.nets[i].linked_conns_arr[j].pad_offset.y = (double)pad.value()["placement"]["shift"][1];
-                    net_list.nets[i].linked_conns_arr[j].pad_offset.z = 0; 
+                    net_list->nets[i].linked_conns_arr[j].pad_angle = (double)pad.value()["placement"]["angle"];
+                    net_list->nets[i].linked_conns_arr[j].pad_offset.x = (double)pad.value()["placement"]["shift"][0];
+                    net_list->nets[i].linked_conns_arr[j].pad_offset.y = (double)pad.value()["placement"]["shift"][1];
+                    net_list->nets[i].linked_conns_arr[j].pad_offset.z = 0; 
                     break;
                 }
             }
-
         }
     }
 
@@ -287,19 +289,21 @@ net_group_t net_generation(component_group_t * components){
 void board_load_and_parse(component_group_t * comp_group, const std::string& filename){
     json board_file = json_load(filename);
 
+    // get placed packages
+    // TODO: add self placement
     for(auto comp = board_file["packages"].begin(); comp != board_file["packages"].end(); comp++){
         for (uint32_t i = 0; i < comp_group->comp_arr.size(); i++){
             // std::cout << comp.key() << std::endl;
+                // comp_group->comp_arr[i].is_used = false;
             if (comp_group->comp_arr[i].component_id == str_to_uuid(comp.value()["component"])){
                 comp_group->comp_arr[i].pos_offset.x = comp.value()["placement"]["shift"][0];
                 comp_group->comp_arr[i].pos_offset.y = comp.value()["placement"]["shift"][1];
                 comp_group->comp_arr[i].pos_offset.z = 0;
                 comp_group->comp_arr[i].angle = comp.value()["placement"]["angle"]; 
                 comp_group->comp_arr[i].mirrored = comp.value()["placement"]["mirror"]; 
+                // comp_group->comp_arr[i].is_used = true;
                 break;
             }
         }
     }
-
-
 }

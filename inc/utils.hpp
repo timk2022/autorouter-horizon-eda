@@ -97,6 +97,8 @@ class Component{
         bool mirrored;        
         struct Vec3 pos_offset;
         double angle;
+        // memory bug: adding is_used causes memory interference
+        bool is_used;
 
         std::vector<connection_t> conn_arr;
 
@@ -111,7 +113,8 @@ class Component{
             conn_arr(std::vector<connection_t>(c.conn_arr)),
             pos_offset(pos_offset),
             angle(angle),
-            mirrored(mirrored)
+            mirrored(mirrored)//,
+            // is_used(is_used)
         {}
 
         Component operator = (const Component& c) {
@@ -125,6 +128,7 @@ class Component{
                 pos_offset = c.pos_offset;
                 angle = c.angle;
                 mirrored = c.mirrored;
+                // is_used = c.is_used;
             }
             return *this;
         }
@@ -210,9 +214,9 @@ struct net_group_t {
 
 
 
-struct component_group_t load_top_block(const std::string& filename);
+struct component_group_t * load_top_block(const std::string& filename);
 void print_component_group(struct component_group_t * component_arr);
 void print_net_list(struct net_group_t * net_list);
 
-net_group_t net_generation(component_group_t * components);
+net_group_t * net_generation(component_group_t * components);
 void board_load_and_parse(component_group_t * comp_group, const std::string& filename);
