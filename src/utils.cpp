@@ -272,7 +272,6 @@ net_group_t * net_generation(component_group_t * components){
 
             for (auto pad = package_file["pads"].begin(); pad != package_file["pads"].end(); pad++){
                 if(net_list->nets[i].linked_conns_arr[j].pad == str_to_uuid(pad.key())){
-
                     net_list->nets[i].linked_conns_arr[j].pad_angle = (double)pad.value()["placement"]["angle"];
                     net_list->nets[i].linked_conns_arr[j].pad_offset.x = (double)pad.value()["placement"]["shift"][0];
                     net_list->nets[i].linked_conns_arr[j].pad_offset.y = (double)pad.value()["placement"]["shift"][1];
@@ -294,16 +293,20 @@ void board_load_and_parse(component_group_t * comp_group, const std::string& fil
     for(auto comp = board_file["packages"].begin(); comp != board_file["packages"].end(); comp++){
         for (uint32_t i = 0; i < comp_group->comp_arr.size(); i++){
             // std::cout << comp.key() << std::endl;
-                // comp_group->comp_arr[i].is_used = false;
+            comp_group->comp_arr[i].is_used = false;
             if (comp_group->comp_arr[i].component_id == str_to_uuid(comp.value()["component"])){
+                comp_group->comp_arr[i].board_comp_id = str_to_uuid(comp.key());
                 comp_group->comp_arr[i].pos_offset.x = comp.value()["placement"]["shift"][0];
                 comp_group->comp_arr[i].pos_offset.y = comp.value()["placement"]["shift"][1];
                 comp_group->comp_arr[i].pos_offset.z = 0;
                 comp_group->comp_arr[i].angle = comp.value()["placement"]["angle"]; 
                 comp_group->comp_arr[i].mirrored = comp.value()["placement"]["mirror"]; 
-                // comp_group->comp_arr[i].is_used = true;
+                comp_group->comp_arr[i].is_used = true;
+                comp_group->comp_arr[i].is_fixed = comp.value()["fixed"];
                 break;
             }
         }
     }
+
+
 }

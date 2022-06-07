@@ -11,6 +11,44 @@
 
 class Component;
 
+struct Vec3_int {
+    int x,y,z;
+    Vec3_int(int x , int y, int z): x(x), y(y), z(z) {}
+    Vec3_int(const Vec3_int& v): x(v.x), y(v.y), z(v.z) {}
+    Vec3_int() {}
+
+    Vec3_int operator + (const Vec3_int& v) const { return Vec3_int(x+v.x, y+v.y, z+v.z); }
+    Vec3_int operator - (const Vec3_int& v) const { return Vec3_int(x-v.x, y-v.y, z-v.z); }
+    Vec3_int operator * (float d) const { return Vec3_int(x*d, y*d, z*d); }
+    Vec3_int operator / (float d) const { return Vec3_int(x/d, y/d, z/d); }
+    Vec3_int max(const Vec3_int& v)
+    { 
+        return Vec3_int((x>v.x) ? x : v.x,(y>v.y) ? y : v.y,(z>v.z) ? z : v.z);
+    }
+
+
+    double distance_xy(const Vec3_int& v){
+        double dist_2 = pow(x-v.x, 2) + pow(y-v.y, 2);
+        if (dist_2 > 0){
+            return sqrt(dist_2);
+        } 
+        // change this?
+        return 0;
+    }
+    double distance(const Vec3_int& v){
+        double dist_2 = pow(x-v.x, 2) + pow(y-v.y, 2) + pow(z-v.z,2);
+        if (dist_2 > 0){
+            return sqrt(dist_2);
+        } 
+        // change this?
+        return 0;
+    }
+
+    void print() const {
+        printf("x: %i, y: %i, z: %i\n",x,y,z);
+    }
+
+};
 
 struct Vec3 {
   double x,y,z;
@@ -46,7 +84,7 @@ struct connection_t{
 
     UUID pad;
     UUID package_id;
-    struct Vec3 pad_offset;
+    struct Vec3_int pad_offset;
     double pad_angle;
     // unsigned long long net_hashed;
     // connection_t(UUID gate, UUID pin, UUID comp_id, Component * comp_pointer, UUID net) :
@@ -86,19 +124,24 @@ struct connection_t{
     // }
 };
 
+//todo: add courtyard as bounds
+
 class Component{
     public:
         UUID component_id;
+        UUID board_comp_id;
+
         UUID entity_id;
         UUID part_id;
         UUID group;
         UUID tag;
 
         bool mirrored;        
-        struct Vec3 pos_offset;
+        struct Vec3_int pos_offset;
         double angle;
         // memory bug: adding is_used causes memory interference
         bool is_used;
+        bool is_fixed;
 
         std::vector<connection_t> conn_arr;
 
@@ -106,6 +149,7 @@ class Component{
 
         Component(const Component& c) :
             component_id(c.component_id),
+            board_comp_id(c.board_comp_id),
             entity_id(c.entity_id),
             part_id(c.part_id),
             group(c.group),
@@ -113,13 +157,15 @@ class Component{
             conn_arr(std::vector<connection_t>(c.conn_arr)),
             pos_offset(pos_offset),
             angle(angle),
-            mirrored(mirrored)//,
-            // is_used(is_used)
+            mirrored(mirrored),
+            is_used(is_used),
+            is_fixed(is_fixed)
         {}
 
         Component operator = (const Component& c) {
             if (this != &c){
                 component_id = c.component_id;
+                board_comp_id = c.board_comp_id;
                 entity_id = c.entity_id;
                 part_id = c.part_id;
                 group = c.group;
@@ -128,7 +174,8 @@ class Component{
                 pos_offset = c.pos_offset;
                 angle = c.angle;
                 mirrored = c.mirrored;
-                // is_used = c.is_used;
+                is_used = c.is_used;
+                is_fixed = c.is_fixed;
             }
             return *this;
         }

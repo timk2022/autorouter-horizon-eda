@@ -25,7 +25,7 @@ int main(void){
     net_group_t * net_groups;
     net_groups = net_generation(components);
     
-    print_net_list(net_groups); 
+    // print_net_list(net_groups); 
 
     board_load_and_parse(components, "pcb-project/autorouter-testing/board.json");
     // print_component_group(components);
