@@ -12,6 +12,7 @@
 #include <nlohmann/json.hpp>
 
 #include "utils.hpp"
+#include "pathing.hpp"
 
 // for convenience
 using json = nlohmann::json;
@@ -22,12 +23,15 @@ using json = nlohmann::json;
 int main(void){
     component_group_t * components; 
     components = load_top_block("pcb-project/autorouter-testing/top_block.json");
-    net_group_t * net_groups;
-    net_groups = net_generation(components);
     
     // print_net_list(net_groups); 
 
-    board_load_and_parse(components, "pcb-project/autorouter-testing/board.json");
     // print_component_group(components);
+    board_load_and_parse(components, "pcb-project/autorouter-testing/board.json");
+    print_component_group(components);
+    
+    net_group_t * net_groups;
+    net_groups = net_generation(components);
+    path_from_netlist(net_groups);    
     
 }

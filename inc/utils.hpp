@@ -10,6 +10,31 @@
 // typedef struct Component;
 
 class Component;
+// class Vec3;
+// class Vec3_int;
+struct Vec3 {
+  double x,y,z;
+   Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
+   Vec3(const Vec3& v): x(v.x), y(v.y), z(v.z) {}
+   
+   Vec3() {}
+   
+   Vec3 operator + (const Vec3& v) const { return Vec3(x+v.x, y+v.y, z+v.z); }
+   Vec3 operator - (const Vec3& v) const { return Vec3(x-v.x, y-v.y, z-v.z); }
+   Vec3 operator * (float d) const { return Vec3(x*d, y*d, z*d); }
+   Vec3 operator / (float d) const { return Vec3(x/d, y/d, z/d); }
+   Vec3 max(const Vec3& v)
+  { 
+    return Vec3((x>v.x) ? x : v.x,(y>v.y) ? y : v.y,(z>v.z) ? z : v.z);
+  }
+   Vec3 normalize() const {
+    double mg = sqrt(x*x + y*y + z*z);
+    return Vec3(x/mg,y/mg,z/mg);
+  }
+   void print() const {
+    printf("x: %f, y: %f, z: %f\n",x,y,z);
+  }
+};
 
 struct Vec3_int {
     int x,y,z;
@@ -19,6 +44,7 @@ struct Vec3_int {
 
     Vec3_int operator + (const Vec3_int& v) const { return Vec3_int(x+v.x, y+v.y, z+v.z); }
     Vec3_int operator - (const Vec3_int& v) const { return Vec3_int(x-v.x, y-v.y, z-v.z); }
+    
     Vec3_int operator * (float d) const { return Vec3_int(x*d, y*d, z*d); }
     Vec3_int operator / (float d) const { return Vec3_int(x/d, y/d, z/d); }
     Vec3_int max(const Vec3_int& v)
@@ -26,6 +52,12 @@ struct Vec3_int {
         return Vec3_int((x>v.x) ? x : v.x,(y>v.y) ? y : v.y,(z>v.z) ? z : v.z);
     }
 
+    int dot(const Vec3_int& v){
+        return (x*v.x + y*v.y+ z*v.z);
+    }
+    double dot(const Vec3& v){
+        return ((double)x*v.x + (double)y*v.y+ (double)z*v.z);
+    }
 
     double distance_xy(const Vec3_int& v){
         double dist_2 = pow(x-v.x, 2) + pow(y-v.y, 2);
@@ -50,29 +82,7 @@ struct Vec3_int {
 
 };
 
-struct Vec3 {
-  double x,y,z;
-   Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
-   Vec3(const Vec3& v): x(v.x), y(v.y), z(v.z) {}
-   
-   Vec3() {}
-   
-   Vec3 operator + (const Vec3& v) const { return Vec3(x+v.x, y+v.y, z+v.z); }
-   Vec3 operator - (const Vec3& v) const { return Vec3(x-v.x, y-v.y, z-v.z); }
-   Vec3 operator * (float d) const { return Vec3(x*d, y*d, z*d); }
-   Vec3 operator / (float d) const { return Vec3(x/d, y/d, z/d); }
-   Vec3 max(const Vec3& v)
-  { 
-    return Vec3((x>v.x) ? x : v.x,(y>v.y) ? y : v.y,(z>v.z) ? z : v.z);
-  }
-   Vec3 normalize() const {
-    double mg = sqrt(x*x + y*y + z*z);
-    return Vec3(x/mg,y/mg,z/mg);
-  }
-   void print() const {
-    printf("x: %f, y: %f, z: %f\n",x,y,z);
-  }
-};
+
 
 struct connection_t{
     UUID gate;

@@ -74,4 +74,8 @@ class Path {
 struct path_group_t {
     std::vector<Path> path_arr;
     uint32_t num_paths;
+
+    path_group_t (){}
 };
+
+void path_from_netlist(net_group_t * net_list);
