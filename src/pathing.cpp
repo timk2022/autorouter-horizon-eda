@@ -11,17 +11,32 @@ namespace plt = matplotlibcpp;
 void plot_path_starts(path_group_t * paths){
     // plt::figure_size(1200,780);
     
+    std::cout << "============== PLOTTING PATHS ===============" << std::endl;
 
-    std::vector<uint32_t> x, y;
+    std::vector<int> x, y;
+    // x.reserve(10);
+    // y.reserve(10);
 
-    std::cout << paths->path_arr.size() << std::endl;
-    for (auto i = 0; i < paths->path_arr.size(); i++){
+    // std::cout << paths->path_arr.size() << std::endl;
+    for (auto i = paths->path_arr.begin(); i != paths->path_arr.end(); i++){// paths->path_arr.size(); i++){
+        // x[i] = paths->path_arr[i].start.pos.x;
+        // y[i] = paths->path_arr[i].start.pos.y;
+        x.push_back(i->start.pos.x);
+        y.push_back(i->start.pos.y);
+
         // x.push_back(paths->path_arr[i].start.pos.x);
-        // y.push_back(paths->path_arr[i].start.pos.y);    
-        std:: cout << "===================" << std::endl;
-            paths->path_arr[i].start.pos.print();
-        std:: cout << "===================" << std::endl;
-        for (auto j = 0; j < paths->path_arr[i].ends.size(); j++){
+        // y.push_back(paths->path_arr[i].start.pos.y);
+        // x.at(i) = paths->path_arr[i].start.pos.x;
+        // y.at(i) = paths->path_arr[i].start.pos.y;
+        // i->start.pos.print();
+        std::cout << x.back() << " " << y.back() <<std::endl;    
+        // std:: cout << "===================" << std::endl;
+        //     paths->path_arr[i].start.pos.print();
+        // std:: cout << "===================" << std::endl;
+        for (auto j = i->ends.begin(); j != i->ends.end(); j++){
+            x.push_back(j->pos.x);
+            y.push_back(j->pos.y);
+            // j->pos.print();
             // x.push_back(paths->path_arr[i].ends[j].pos.x);
             // y.push_back(paths->path_arr[i].ends[j].pos.y);    
             // paths->path_arr[i].ends[j].pos.print();
@@ -29,7 +44,7 @@ void plot_path_starts(path_group_t * paths){
     }    
     plt::figure_size(1200, 780);
     plt::scatter(x,y);
-    plt::save("tmp.png");
+    plt::save("tmp2.png");
 }
 
 
@@ -37,21 +52,23 @@ void path_from_netlist(net_group_t * net_list){
     // rumbling 
     path_group_t * paths = new path_group_t;
 
+    paths->num_paths = net_list->nets.size();
+    // std::cout << net_list->nets.size() << std::endl;
+    paths->path_arr.reserve(net_list->nets.size());
 
-    paths->path_arr.reserve(4);
-
-    std::vector<int> x, y;
-
-    std::cout << sizeof(Path) <<std::endl;
+    int counter = 0;
     // initializing pathing
-    for(auto i = 0; i<net_list->nets.size(); i++){
+    for(auto i = net_list->nets.begin(); i != net_list->nets.end(); i++){
         Path new_path;
-        new_path.ends.reserve(2);
-        for (auto j = 0; j < net_list->nets[i].linked_conns_arr.size(); j++){
-            Vec3_int comp_center = net_list->nets[i].linked_conns_arr[j].comp_pointer->pos_offset;
-            int comp_angle = TAU * net_list->nets[i].linked_conns_arr[j].comp_pointer->angle / MAX_ANGLE;
+        new_path.num_ends = 0;
+        // new_path.ends.reserve(net_list->nets[i].linked_conns_arr.size());
+        new_path.ends.reserve(i->linked_conns_arr.size());
+        for (auto j = i->linked_conns_arr.begin(); j != i->linked_conns_arr.end(); j++){
+            Vec3_int comp_center = j->comp_pointer->pos_offset; 
+            int comp_angle = TAU * j->comp_pointer->angle / MAX_ANGLE;  
+            
 
-            Vec3_int pad_center = net_list->nets[i].linked_conns_arr[j].pad_offset;
+            Vec3_int pad_center = j->pad_offset;
 
             // x.push_back((comp_center+pad_center).x);
             // y.push_back((comp_center+pad_center).y);
@@ -68,15 +85,22 @@ void path_from_netlist(net_group_t * net_list){
             node new_node;
             new_node.pos = pad_center_new;
             new_node.prev_node_index= UINT32_MAX;
-            if (j == 0){
+            if (j == i->linked_conns_arr.begin()){
                 new_path.start = new_node;
                 new_path.start.pos.print();
             } else {
                 new_path.ends.push_back(new_node);
-                new_path.ends[j].pos.print();
+                new_path.ends.back().pos.print();
+                // new_path.ends[j-1] = (new_node);
+                // new_path.ends[j-1].pos.print();
+                new_path.num_ends++;
             }
         }
-        paths->path_arr[i] = new_path;
+        // paths->path_arr[counter++] = (new_path);
+        paths->path_arr.push_back(new_path);
+    }
+    for (auto i =0; i < paths->path_arr.size(); i++){
+        // paths->path_arr[i].start.pos.print();
     }
     // plt::figure_size(1200, 780);
     // plt::scatter(x,y);

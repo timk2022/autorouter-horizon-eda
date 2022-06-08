@@ -89,6 +89,7 @@ void print_net_list(struct net_group_t * net_list){
             net_list->nets[i].linked_conns_arr[j].pad_offset.print();
         }
     }
+    std:: cout << "=================NET LIST DEBUG END===================\n";
 }
 
 

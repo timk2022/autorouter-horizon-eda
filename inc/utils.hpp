@@ -204,6 +204,10 @@ struct component_group_t {
         j(j),
         comp_arr(std::vector<Component>(comp_arr))
         {}
+
+    ~component_group_t(){
+        comp_arr.clear();
+    }
     // component_group_t(nlohmann::json j, std::vector<Component> comp_arr, uint32_t comp_arr_len) :
     //     j(j), comp_arr(comp_arr), comp_arr_len(comp_arr_len) {}
 };
@@ -216,6 +220,10 @@ struct connection_group_t{
 
     connection_group_t(std::vector<connection_t> conn_arr, uint32_t conn_arr_len) :
        conn_arr(conn_arr), conn_arr_len(conn_arr_len) {} 
+
+    ~connection_group_t(){
+        conn_arr.clear();
+    }
 };
 
 struct net_t {
@@ -256,6 +264,10 @@ struct net_t {
             linked_conns_arr_len = n.linked_conns_arr_len;
         }
         return *this;
+    }
+
+    ~net_t (){
+        linked_conns_arr.clear();
     }
 };
 
