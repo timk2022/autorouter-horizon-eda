@@ -41,25 +41,25 @@ struct obstacle_group_t {
     std::vector<Obstacle> obs_arr;
     uint32_t num_obs;
 };
-
+ struct node {
+    uint32_t prev_node_index;
+    Vec3_int pos;
+    node () {}
+    node(const node& n) :
+        prev_node_index(prev_node_index),
+        pos(pos)
+    {}
+    node operator = (const node& n){
+        if (this != &n){
+            prev_node_index = n.prev_node_index;
+            pos = n.pos;
+        }
+        return *this;
+    }
+};
 class Path {
     public:
-        struct node {
-            uint32_t prev_node_index;
-            Vec3_int pos;
-            node () {}
-            node(const node& n) :
-                prev_node_index(prev_node_index),
-                pos(pos)
-            {}
-            node operator = (const node& n){
-                if (this != &n){
-                    prev_node_index = n.prev_node_index;
-                    pos = n.pos;
-                }
-                return *this;
-            }
-        };
+       
 
         node start;
         std::vector<node> ends;
@@ -68,6 +68,16 @@ class Path {
         std::vector<node> node_tree;
         uint32_t num_nodes;
 
+        Path operator = (const Path& p){
+            if (this != &p){
+                start = p.start;
+                // ends = std::vector<node>(p.ends);
+                num_ends = p.num_ends;
+                // node_tree = std::vector<node>(p.node_tree);
+                num_nodes = p.num_nodes;
+            }
+            return *this;
+        }
 
 };
 
