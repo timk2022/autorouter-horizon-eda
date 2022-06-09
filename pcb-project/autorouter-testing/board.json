@@ -87,7 +87,7 @@
                 1000000,
                 1000000
             ],
-            "spacing_square": 1000000
+            "spacing_square": 10000
         },
         "grids": {}
     },

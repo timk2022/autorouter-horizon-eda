@@ -251,14 +251,43 @@ net_group_t * net_generation(component_group_t * components){
 
             }
 
+            // pad mapping 
             for (auto pad_map = part_file["pad_map"].begin(); pad_map != part_file["pad_map"].end(); pad_map++){
                 if(net_list->nets[i].linked_conns_arr[j].gate == str_to_uuid(pad_map.value()["gate"]) &&
                    net_list->nets[i].linked_conns_arr[j].pin == str_to_uuid(pad_map.value()["pin"])){
                     net_list->nets[i].linked_conns_arr[j].pad = str_to_uuid(pad_map.key());
                     break;
                 }
-
             }
+
+
+            //TODO: add keepout support 
+            // courtyard mapping
+            if (part_file.contains("polygons")){
+                for (auto polygon_map = part_file["polygons"].begin(); polygon_map != part_file["polygons"].end(); polygon_map++){
+                    if (polygon_map.value()["parameter_class"] == "courtyard"){
+                        auto comp_pointer= net_list->nets[i].linked_conns_arr[j].comp_pointer;
+                        comp_pointer->courtyard.polygon_id = str_to_uuid(polygon_map.key());
+
+                        for(auto vert = polygon_map.value()["verticies"].begin(); vert != polygon_map.value()["verticies"].end(); vert++){
+                            if (vert.value()["type"] == "line"){
+                                comp_pointer->courtyard.line_type.push_back(polygon::POLYGON_STRAIGHT);
+                            } else if (vert.value()["type"] == "curve"){
+                                comp_pointer->courtyard.line_type.push_back(polygon::POLYGON_CURVE);
+                            }
+                            comp_pointer->courtyard.verticies.push_back(std::make_pair(
+                                                                        Vec3_int(vert.value()["position"][0],vert.value()["position"][1],0),
+                                                                        Vec3_int(vert.value()["arc_center"][0],vert.value()["arc_center"][1],0)
+                                                                        ));
+                            // todo: add curve support
+                        }
+                    }
+                }
+            } else {
+                std::cout << "no polygons found in file for part " << net_list->nets[i].linked_conns_arr[j].comp_pointer->part_id << std::endl;
+            }
+
+
             
             package_id_str = std::string(part_file["package"]);
 
@@ -277,6 +306,29 @@ net_group_t * net_generation(component_group_t * components){
                     net_list->nets[i].linked_conns_arr[j].pad_offset.x = (double)pad.value()["placement"]["shift"][0];
                     net_list->nets[i].linked_conns_arr[j].pad_offset.y = (double)pad.value()["placement"]["shift"][1];
                     net_list->nets[i].linked_conns_arr[j].pad_offset.z = 0; 
+
+                    auto comp_pointer = net_list->nets[i].linked_conns_arr[j].comp_pointer;
+                    polygon new_pad;
+                    new_pad.polygon_id = str_to_uuid(pad.key());
+                    int height = pad.value()["parameter_set"]["pad_height"];
+                    int width = pad.value()["parameter_set"]["pad_width"];
+                    int curve_radius = pad.value()["parameter_set"]["corner_radius"];
+
+                    // todo: add curve support
+                    // adding rectangle                    
+                    // todo: adjust for non zero center
+                    new_pad.verticies.push_back(std::make_pair(Vec3_int(-width/2, -height/2,0), Vec3_int(0,0,0)));
+                    new_pad.line_type.push_back(polygon::POLYGON_STRAIGHT);
+                    new_pad.verticies.push_back(std::make_pair(Vec3_int(width/2, -height/2,0), Vec3_int(0,0,0)));
+                    new_pad.line_type.push_back(polygon::POLYGON_STRAIGHT);
+                    new_pad.verticies.push_back(std::make_pair(Vec3_int(width/2, height/2,0), Vec3_int(0,0,0)));
+                    new_pad.line_type.push_back(polygon::POLYGON_STRAIGHT);
+                    new_pad.verticies.push_back(std::make_pair(Vec3_int(-width/2, height/2,0), Vec3_int(0,0,0)));
+                    new_pad.line_type.push_back(polygon::POLYGON_STRAIGHT);
+
+                    comp_pointer->pads.push_back(new_pad);
+
+
                     break;
                 }
             }

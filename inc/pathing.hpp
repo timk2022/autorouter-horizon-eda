@@ -6,6 +6,7 @@ class Obstacle {
     public:
         // treating each obstacle as being bounded by a rectangle
         Vec3_int center;
+        std::vector<polygon> vert; 
         Vec3_int side_half_lengths;
 
         Obstacle(){}
@@ -27,15 +28,48 @@ class Obstacle {
         // return true if given point is within bounds
         bool intersects(Vec3_int point) {
             if (point.z == center.z){
-                if(point.x >= (center.x - side_half_lengths.x) && point.x <= (center.x + side_half_lengths.x)){
-                    if(point.y >= (center.y - side_half_lengths.y) && point.y <= (center.y + side_half_lengths.y)){
-                        return true;
+                if (!cached){
+                    for (auto i = vert.begin(); i != vert.end(); i++){
+                        for (auto j = i-> verticies.begin(); j != i->verticies.end(); j++){
+                            if(j->first.x > x_max){
+                                x_max = j->first.x;
+                            } else if (j->first.x < x_min){
+                                x_min = j->first.x;
+                            }
+                            if(j->first.y > y_max){
+                                y_max = j->first.y;
+                            } else if (j->first.y < y_min){
+                                y_min = j->first.y;
+                            }
+                        }
                     }
+                    cached = true;
+                }
+                if (point.x >= x_min && point.x <= x_max && point.y >= y_min && point.y <= y_max){
+
                 }
             }
             return false;
         }
 
+        std::pair<std::vector<int>, std::vector<int>> get_vectors(void){
+            std::pair<std::vector<int>, std::vector<int>> vecs;
+
+            for (auto i = vert.begin(); i != vert.end(); i++){
+                for (auto j = i-> verticies.begin(); j != i->verticies.end(); j++){
+                    vecs.first.push_back(j->first.x);
+                    vecs.second.push_back(j->first.y);
+                }
+            }
+            return vecs;
+        }
+
+    private:
+        int x_min = INT32_MAX;
+        int x_max = INT32_MIN;
+        int y_min = INT32_MAX;
+        int y_max = INT32_MIN;
+        bool cached = false;
 };
 
 struct obstacle_group_t {
@@ -129,4 +163,4 @@ struct path_group_t {
     }
 };
 
-void path_from_netlist(net_group_t * net_list);
+void path_from_netlist(net_group_t * net_list, component_group_t * components);

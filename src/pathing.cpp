@@ -8,38 +8,47 @@
 
 namespace plt = matplotlibcpp;
 
-void plot_path_starts(path_group_t * paths){
-    // plt::figure_size(1200,780);
-    
+void plot_path_starts(path_group_t * paths, obstacle_group_t * obstacles){
     std::cout << "============== PLOTTING PATHS ===============" << std::endl;
+
+    // std::vector<std::vector<int>> x_tmp, y_tmp;
+
+    for(auto i = obstacles->obs_arr.begin(); i != obstacles->obs_arr.end(); i++){
+        std::vector<int> x_tmp, y_tmp;
+        std::pair<std::vector<int>, std::vector<int>> tmp_vecs;
+        tmp_vecs = i->get_vectors();
+        plt::plot(tmp_vecs.first, tmp_vecs.second);
+    }
 
     std::vector<int> x, y;
 
-    for (auto i = paths->path_arr.begin(); i != paths->path_arr.end(); i++){// paths->path_arr.size(); i++){
+    std::vector<int> x_ends, y_ends;
+
+    for (auto i = paths->path_arr.begin(); i != paths->path_arr.end(); i++){
         x.push_back(i->start.pos.x);
         y.push_back(i->start.pos.y);
 
         for (auto j = i->ends.begin(); j != i->ends.end(); j++){
-            x.push_back(j->pos.x);
-            y.push_back(j->pos.y);
-    
+            x_ends.push_back(j->pos.x);
+            y_ends.push_back(j->pos.y);
         }
     }    
     plt::figure_size(1200, 780);
     plt::scatter(x,y);
+    plt::scatter(x_ends, y_ends);
+    
     // plt::save("tmp2.png");
     plt::show();
 }
 
 
-void path_from_netlist(net_group_t * net_list){
+void path_from_netlist(net_group_t * net_list, component_group_t * components){
     // rumbling 
     path_group_t * paths = new path_group_t;
 
     paths->num_paths = net_list->nets.size();
     paths->path_arr.reserve(net_list->nets.size());
 
-    int counter = 0;
     // initializing pathing
     for(auto i = net_list->nets.begin(); i != net_list->nets.end(); i++){
         Path new_path;
@@ -72,5 +81,26 @@ void path_from_netlist(net_group_t * net_list){
         }
         paths->path_arr.push_back(new_path);
     }
-    plot_path_starts(paths);
+
+    obstacle_group_t * obstacles = new obstacle_group_t;
+
+    obstacles->num_obs = components->comp_arr.size();
+    obstacles->obs_arr.reserve(obstacles->num_obs);
+
+    for(auto i = components->comp_arr.begin(); i != components->comp_arr.end(); i++){
+        Obstacle new_obstacle;
+        new_obstacle.center = i->pos_offset;
+        new_obstacle.vert.push_back(i->courtyard);
+        obstacles->obs_arr.push_back(new_obstacle);
+        
+        
+        // new_obstacle.side_half_lengths
+    }
+
+
+    // std::cout << "obs:" <<obstacles->num_obs << std::endl;
+
+
+
+    plot_path_starts(paths, obstacles);
 }

@@ -8,14 +8,10 @@
 #include <iostream>
 #include <ctime>
 #include <iomanip>
-// using json library https://github.com/nlohmann/json
-#include <nlohmann/json.hpp>
 
 #include "utils.hpp"
 #include "pathing.hpp"
 
-// for convenience
-using json = nlohmann::json;
 
 
 
@@ -32,6 +28,6 @@ int main(void){
     net_group_t * net_groups;
     net_groups = net_generation(components);
     print_net_list(net_groups); 
-    path_from_netlist(net_groups);    
+    path_from_netlist(net_groups, components);    
     
 }

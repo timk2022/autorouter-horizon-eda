@@ -136,6 +136,37 @@ struct connection_t{
 
 //todo: add courtyard as bounds
 
+struct polygon {
+    std::vector<std::pair<Vec3_int, Vec3_int>> verticies;
+
+    // line_0 connects vertex 0 and vertex 1
+    // if it is curved, it is marked as a curve
+    // and the curve center is set in verticies.second
+    enum line_t{POLYGON_STRAIGHT,POLYGON_CURVE};
+    std::vector<line_t> line_type;
+
+    UUID polygon_id;
+
+    polygon(){}
+    polygon(const polygon& p) :
+        verticies(p.verticies),
+        line_type(p.line_type),
+        polygon_id(p.polygon_id)
+    {}
+    polygon operator = (const polygon& p){
+        if(this != &p){
+            verticies = p.verticies;
+            line_type = p.line_type;
+            polygon_id = p.polygon_id;
+        }
+        return *this;
+    }
+    ~polygon(){
+        verticies.clear();
+        line_type.clear();
+    }
+};
+
 class Component{
     public:
         UUID component_id;
@@ -149,9 +180,14 @@ class Component{
         bool mirrored;        
         struct Vec3_int pos_offset;
         double angle;
-        // memory bug: adding is_used causes memory interference
         bool is_used;
         bool is_fixed;
+
+        // package object information
+        // used for spacing calcs
+        polygon courtyard;
+        std::vector<polygon> pads;
+
 
         std::vector<connection_t> conn_arr;
 
