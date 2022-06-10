@@ -7,7 +7,8 @@ class Obstacle {
     public:
         // treating each obstacle as being bounded by a rectangle
         Vec3_int center;
-        std::vector<polygon> vert; 
+        // todo: add support for nested polygons  (ex: donut)
+        polygon vert; 
         Vec3_int side_half_lengths;
 
         Obstacle(){}
@@ -32,20 +33,19 @@ class Obstacle {
         bool intersects(Vec3_int point) {
             if (point.z == center.z){
                 if (!cached){
-                    for (auto i = vert.begin(); i != vert.end(); i++){
-                        for (auto j = i-> vertices.begin(); j != i->vertices.end(); j++){
-                            if(j->first.x > x_max){
-                                x_max = j->first.x;
-                            } else if (j->first.x < x_min){
-                                x_min = j->first.x;
-                            }
-                            if(j->first.y > y_max){
-                                y_max = j->first.y;
-                            } else if (j->first.y < y_min){
-                                y_min = j->first.y;
-                            }
+                    for (auto i = vert.vertices.begin(); i != vert.vertices.end(); i++){
+                        if(i->first.x > x_max){
+                            x_max = i->first.x;
+                        } else if (i->first.x < x_min){
+                            x_min = i->first.x;
+                        }
+                        if(i->first.y > y_max){
+                            y_max = i->first.y;
+                        } else if (i->first.y < y_min){
+                            y_min = i->first.y;
                         }
                     }
+                    
                     cached = true;
                 }
                 if (point.x >= x_min && point.x <= x_max && point.y >= y_min && point.y <= y_max){
@@ -58,12 +58,11 @@ class Obstacle {
         std::pair<std::vector<int>, std::vector<int>> get_vectors(void){
             std::pair<std::vector<int>, std::vector<int>> vecs;
 
-            for (auto i = vert.begin(); i != vert.end(); i++){
-                for (auto j = i-> vertices.begin(); j != i->vertices.end(); j++){
-                    vecs.first.push_back(j->first.x + center.x);
-                    vecs.second.push_back(j->first.y+center.y);
-                }
+            for (auto i = vert.vertices.begin(); i != vert.vertices.end(); i++){
+                vecs.first.push_back(i->first.x + center.x);
+                vecs.second.push_back(i->first.y + center.y);
             }
+            
             return vecs;
         }
 

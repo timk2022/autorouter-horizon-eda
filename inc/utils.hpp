@@ -13,27 +13,33 @@ class Component;
 // class Vec3;
 // class Vec3_int;
 struct Vec3 {
-  double x,y,z;
-   Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
-   Vec3(const Vec3& v): x(v.x), y(v.y), z(v.z) {}
-   
-   Vec3() {}
-   
-   Vec3 operator + (const Vec3& v) const { return Vec3(x+v.x, y+v.y, z+v.z); }
-   Vec3 operator - (const Vec3& v) const { return Vec3(x-v.x, y-v.y, z-v.z); }
-   Vec3 operator * (float d) const { return Vec3(x*d, y*d, z*d); }
-   Vec3 operator / (float d) const { return Vec3(x/d, y/d, z/d); }
-   Vec3 max(const Vec3& v)
-  { 
-    return Vec3((x>v.x) ? x : v.x,(y>v.y) ? y : v.y,(z>v.z) ? z : v.z);
-  }
-   Vec3 normalize() const {
-    double mg = sqrt(x*x + y*y + z*z);
-    return Vec3(x/mg,y/mg,z/mg);
-  }
-   void print() const {
-    printf("x: %f, y: %f, z: %f\n",x,y,z);
-  }
+    double x,y,z;
+    Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
+    Vec3(const Vec3& v): x(v.x), y(v.y), z(v.z) {}
+    
+    Vec3() {}
+    
+    Vec3 operator + (const Vec3& v) const { return Vec3(x+v.x, y+v.y, z+v.z); }
+    Vec3 operator - (const Vec3& v) const { return Vec3(x-v.x, y-v.y, z-v.z); }
+    Vec3 operator * (float d) const { return Vec3(x*d, y*d, z*d); }
+    Vec3 operator / (float d) const { return Vec3(x/d, y/d, z/d); }
+    Vec3 max(const Vec3& v)
+    { 
+        return Vec3((x>v.x) ? x : v.x,(y>v.y) ? y : v.y,(z>v.z) ? z : v.z);
+    }
+    Vec3 normalize() const {
+        double mg = sqrt(x*x + y*y + z*z);
+        return Vec3(x/mg,y/mg,z/mg);
+    }
+
+    
+
+    void print() const {
+        printf("x: %f, y: %f, z: %f\n",x,y,z);
+    }
+
+            
+
 };
 
 struct Vec3_int {
@@ -75,6 +81,12 @@ struct Vec3_int {
         // change this?
         return 0;
     }
+    
+    Vec3_int rotate( double angle){
+        Vec3 r_0 = Vec3(cos(angle), -sin(angle),0);
+        Vec3 r_1  = Vec3(sin(angle), cos(angle),0);
+        return Vec3_int(x*r_0.x+y*r_0.y, x*r_1.x + y*r_1.y, 0);
+    }
 
     void print() const {
         printf("x: %i, y: %i, z: %i\n",x,y,z);
@@ -92,7 +104,7 @@ struct connection_t{
     // unsigned long long gate_pin_hashed;
     UUID net;
 
-    UUID pad;
+    UUID pad_id;
     UUID package_id;
     struct Vec3_int pad_offset;
     double pad_angle;
@@ -111,7 +123,7 @@ struct connection_t{
 
         package_id(package_id),
 
-        pad(c.pad),
+        pad_id(c.pad_id),
         pad_offset(c.pad_offset),
         pad_angle(c.pad_angle)        
 
@@ -124,7 +136,7 @@ struct connection_t{
             comp_id = c.comp_id;
             net = c.net;
             comp_pointer = c.comp_pointer;
-            pad = c.pad;
+            pad_id = c.pad_id;
             package_id= c.package_id;
         }  
         return *this;

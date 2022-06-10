@@ -92,25 +92,47 @@ void path_from_netlist(net_group_t * net_list, component_group_t * components){
         Obstacle new_obstacle;
         double comp_angle = TAU * i->angle / MAX_ANGLE;  
         
-        Vec3 r_0 = Vec3(cos(comp_angle), -sin(comp_angle),0);
-        Vec3 r_1  = Vec3(sin(comp_angle), cos(comp_angle),0);
+        // Vec3 r_0 = Vec3(cos(comp_angle), -sin(comp_angle),0);
+        // Vec3 r_1  = Vec3(sin(comp_angle), cos(comp_angle),0);
         
         for (auto j = i->courtyard.vertices.begin(); j != i->courtyard.vertices.end(); j++){
-            j->first = Vec3_int(j->first.dot(r_0), j->first.dot(r_1), 0);
+            j->first = j->first.rotate(comp_angle);
         }
-        // Vec3_int pad_center_new = Vec3_int(pad_center.dot(r_0), pad_center.dot(r_1), 0) + comp_center;
         new_obstacle.center = i->pos_offset;
-        new_obstacle.vert.push_back(i->courtyard);
+        new_obstacle.vert = i->courtyard;
         obstacles->obs_arr.push_back(new_obstacle);
-        
-        
-        // new_obstacle.side_half_lengths
+    }
+
+    for(auto i = net_list->nets.begin(); i!= net_list->nets.end(); i++){
+        for (auto j = i->linked_conns_arr.begin(); j != i->linked_conns_arr.end(); j++){
+            Obstacle new_obstacle;
+            double comp_angle = TAU * j->comp_pointer->angle / MAX_ANGLE;  
+
+            new_obstacle.center = j->pad_offset + j->comp_pointer->pos_offset;
+            int pad_id = j->pad_id;
+            for(auto k = j->comp_pointer->pads.begin(); k != j->comp_pointer->pads.end(); k++){
+                if(k->polygon_id == pad_id){
+                    for (auto x = k->vertices.begin(); x != k->vertices.end(); x++){
+                        // new_obstacle.vert.vertices.push_back(std::make_pair(x->first.rotate(comp_anglex->second))
+                        x->first = x->first.rotate(comp_angle);
+                    }
+                    new_obstacle.vert.vertices = k->vertices;
+                    new_obstacle.vert.line_type = k->line_type;
+                    // new_obstacle.vert= k;/
+                    break;
+                }
+            }
+            obstacles->obs_arr.push_back(new_obstacle);
+        }
     }
 
 
-    // std::cout << "obs:" <<obstacles->num_obs << std::endl;
-
-
+    // for(auto i = components->comp_arr.begin(); i != components->comp_arr.end(); i++){
+    //     Obstacle new_obstacle;
+    //     for(auto j = i->pads.begin(); j!= i->pads.end(); j++){
+    //         if(j->polygon_id == i->)
+    //         new_obstacle.center = i->            
+    //     } 
 
     plot_path_starts(paths, obstacles);
 }
