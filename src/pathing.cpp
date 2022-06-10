@@ -90,6 +90,15 @@ void path_from_netlist(net_group_t * net_list, component_group_t * components){
 
     for(auto i = components->comp_arr.begin(); i != components->comp_arr.end(); i++){
         Obstacle new_obstacle;
+        double comp_angle = TAU * i->angle / MAX_ANGLE;  
+        
+        Vec3 r_0 = Vec3(cos(comp_angle), -sin(comp_angle),0);
+        Vec3 r_1  = Vec3(sin(comp_angle), cos(comp_angle),0);
+        
+        for (auto j = i->courtyard.vertices.begin(); j != i->courtyard.vertices.end(); j++){
+            j->first = Vec3_int(j->first.dot(r_0), j->first.dot(r_1), 0);
+        }
+        // Vec3_int pad_center_new = Vec3_int(pad_center.dot(r_0), pad_center.dot(r_1), 0) + comp_center;
         new_obstacle.center = i->pos_offset;
         new_obstacle.vert.push_back(i->courtyard);
         obstacles->obs_arr.push_back(new_obstacle);
