@@ -2,6 +2,7 @@
 #include "utils.hpp"
 
 #include <vector>
+//todo: add type and component pointer?
 class Obstacle {
     public:
         // treating each obstacle as being bounded by a rectangle
@@ -13,12 +14,14 @@ class Obstacle {
 
         Obstacle(const Obstacle& o) :
             center(o.center),
+            vert(o.vert),
             side_half_lengths(o.side_half_lengths)
         {}
         
 
         Obstacle operator = (const Obstacle& o){
             if (this != &o){
+                vert = o.vert;
                 center = o.center;
                 side_half_lengths= o.side_half_lengths;
             }            
@@ -30,7 +33,7 @@ class Obstacle {
             if (point.z == center.z){
                 if (!cached){
                     for (auto i = vert.begin(); i != vert.end(); i++){
-                        for (auto j = i-> verticies.begin(); j != i->verticies.end(); j++){
+                        for (auto j = i-> vertices.begin(); j != i->vertices.end(); j++){
                             if(j->first.x > x_max){
                                 x_max = j->first.x;
                             } else if (j->first.x < x_min){
@@ -56,9 +59,9 @@ class Obstacle {
             std::pair<std::vector<int>, std::vector<int>> vecs;
 
             for (auto i = vert.begin(); i != vert.end(); i++){
-                for (auto j = i-> verticies.begin(); j != i->verticies.end(); j++){
-                    vecs.first.push_back(j->first.x);
-                    vecs.second.push_back(j->first.y);
+                for (auto j = i-> vertices.begin(); j != i->vertices.end(); j++){
+                    vecs.first.push_back(j->first.x + center.x);
+                    vecs.second.push_back(j->first.y+center.y);
                 }
             }
             return vecs;

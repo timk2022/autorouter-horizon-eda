@@ -10,16 +10,8 @@ namespace plt = matplotlibcpp;
 
 void plot_path_starts(path_group_t * paths, obstacle_group_t * obstacles){
     std::cout << "============== PLOTTING PATHS ===============" << std::endl;
-
-    // std::vector<std::vector<int>> x_tmp, y_tmp;
-
-    for(auto i = obstacles->obs_arr.begin(); i != obstacles->obs_arr.end(); i++){
-        std::vector<int> x_tmp, y_tmp;
-        std::pair<std::vector<int>, std::vector<int>> tmp_vecs;
-        tmp_vecs = i->get_vectors();
-        plt::plot(tmp_vecs.first, tmp_vecs.second);
-    }
-
+    plt::figure_size(1200, 780);
+    
     std::vector<int> x, y;
 
     std::vector<int> x_ends, y_ends;
@@ -33,9 +25,18 @@ void plot_path_starts(path_group_t * paths, obstacle_group_t * obstacles){
             y_ends.push_back(j->pos.y);
         }
     }    
-    plt::figure_size(1200, 780);
     plt::scatter(x,y);
     plt::scatter(x_ends, y_ends);
+
+    // std::vector<std::vector<int>> x_tmp, y_tmp;
+
+    for(auto i = obstacles->obs_arr.begin(); i != obstacles->obs_arr.end(); i++){
+        std::vector<int> x_tmp, y_tmp;
+        std::pair<std::vector<int>, std::vector<int>> tmp_vecs;
+        tmp_vecs = i->get_vectors();
+        plt::plot(tmp_vecs.first, tmp_vecs.second);
+    }
+
     
     // plt::save("tmp2.png");
     plt::show();

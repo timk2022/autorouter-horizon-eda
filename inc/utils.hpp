@@ -137,7 +137,7 @@ struct connection_t{
 //todo: add courtyard as bounds
 
 struct polygon {
-    std::vector<std::pair<Vec3_int, Vec3_int>> verticies;
+    std::vector<std::pair<Vec3_int, Vec3_int>> vertices;
 
     // line_0 connects vertex 0 and vertex 1
     // if it is curved, it is marked as a curve
@@ -149,20 +149,20 @@ struct polygon {
 
     polygon(){}
     polygon(const polygon& p) :
-        verticies(p.verticies),
+        vertices(p.vertices),
         line_type(p.line_type),
         polygon_id(p.polygon_id)
     {}
     polygon operator = (const polygon& p){
         if(this != &p){
-            verticies = p.verticies;
+            vertices = p.vertices;
             line_type = p.line_type;
             polygon_id = p.polygon_id;
         }
         return *this;
     }
     ~polygon(){
-        verticies.clear();
+        vertices.clear();
         line_type.clear();
     }
 };
