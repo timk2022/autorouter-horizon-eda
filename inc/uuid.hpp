@@ -10,54 +10,45 @@
 
 #include <string>
 
-
-
-
 class UUID {
-    public:
-        UUID();
-        static UUID random();
-        UUID(const char *str);
-        UUID(const std::string &str);
-        static UUID UUID5(const UUID &nsid, const unsigned char *name, size_t name_size);
-        operator std::string() const
-        {
-            char str[40];
-            uuid_unparse(uu, str);
-            return std::string(str);
-        }
+public:
+  UUID();
+  static UUID random();
+  UUID(const char *str);
+  UUID(const std::string &str);
+  static UUID UUID5(const UUID &nsid, const unsigned char *name,
+                    size_t name_size);
+  operator std::string() const {
+    char str[40];
+    uuid_unparse(uu, str);
+    return std::string(str);
+  }
 
-        void to_uuid(const std::string& str) {
-            uuid_parse(str.c_str() ,uu);
-        }
+  void to_uuid(const std::string &str) { uuid_parse(str.c_str(), uu); }
 
-        /**
-         *  @return true if uuid is non-null, false otherwise
-         */
-        operator bool() const;
-        const unsigned char *get_bytes() const
-        {
-            return uu;
-        }
-        static constexpr auto size = sizeof(uuid_t);
+  /**
+   *  @return true if uuid is non-null, false otherwise
+   */
+  operator bool() const;
+  const unsigned char *get_bytes() const { return uu; }
+  static constexpr auto size = sizeof(uuid_t);
 
-        friend bool operator==(const UUID &self, const UUID &other);
-        friend bool operator!=(const UUID &self, const UUID &other);
-        friend bool operator<(const UUID &self, const UUID &other);
-        friend bool operator>(const UUID &self, const UUID &other);
-        size_t hash() const
-        {
-            size_t r = 0;
-            for (size_t i = 0; i < 16; i++) {
-                r ^= ((size_t)uu[i]) << ((i % sizeof(size_t)) * 8);
-            }
-            return r;
-        }
+  friend bool operator==(const UUID &self, const UUID &other);
+  friend bool operator!=(const UUID &self, const UUID &other);
+  friend bool operator<(const UUID &self, const UUID &other);
+  friend bool operator>(const UUID &self, const UUID &other);
+  size_t hash() const {
+    size_t r = 0;
+    for (size_t i = 0; i < 16; i++) {
+      r ^= ((size_t)uu[i]) << ((i % sizeof(size_t)) * 8);
+    }
+    return r;
+  }
 
-    private:
-        uuid_t uu;
+private:
+  uuid_t uu;
 };
 
-UUID str_to_uuid(const std::string& str);
+UUID str_to_uuid(const std::string &str);
 
 // static UUID MAX_UUID("ffffffff-ffff-ffff-ffff-ffffffffffff");
