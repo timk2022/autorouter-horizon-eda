@@ -11,7 +11,8 @@ namespace plt = matplotlibcpp;
 void plot_path_starts(path_group_t * paths, obstacle_group_t * obstacles){
     std::cout << "============== PLOTTING PATHS ===============" << std::endl;
     plt::figure_size(1200, 780);
-    
+    plt::xlim(0,6000000);
+    plt::ylim(0,6000000);
     std::vector<int> x, y;
 
     std::vector<int> x_ends, y_ends;
@@ -61,14 +62,7 @@ void path_from_netlist(net_group_t * net_list, component_group_t * components){
             
             Vec3_int pad_center = j->pad_offset;
 
-
-            // rotation matrix
-            Vec3 r_0 = Vec3(cos(comp_angle), -sin(comp_angle),0);
-            Vec3 r_1  = Vec3(sin(comp_angle), cos(comp_angle),0);
-
-            std::cout << comp_angle <<std::endl;
-
-            Vec3_int pad_center_new = Vec3_int(pad_center.dot(r_0), pad_center.dot(r_1), 0) + comp_center;
+            Vec3_int pad_center_new = pad_center.rotate(comp_angle) + comp_center;
             
             node new_node;
             new_node.pos = pad_center_new;
@@ -108,8 +102,8 @@ void path_from_netlist(net_group_t * net_list, component_group_t * components){
             Obstacle new_obstacle;
             double comp_angle = TAU * j->comp_pointer->angle / MAX_ANGLE;  
 
-            new_obstacle.center = j->pad_offset + j->comp_pointer->pos_offset;
-            int pad_id = j->pad_id;
+            new_obstacle.center = j->pad_offset.rotate(comp_angle) + j->comp_pointer->pos_offset;
+            UUID pad_id = j->pad_id;
             for(auto k = j->comp_pointer->pads.begin(); k != j->comp_pointer->pads.end(); k++){
                 if(k->polygon_id == pad_id){
                     for (auto x = k->vertices.begin(); x != k->vertices.end(); x++){
