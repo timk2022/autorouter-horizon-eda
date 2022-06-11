@@ -86,9 +86,6 @@ void path_from_netlist(net_group_t * net_list, component_group_t * components){
         Obstacle new_obstacle;
         double comp_angle = TAU * i->angle / MAX_ANGLE;  
         
-        // Vec3 r_0 = Vec3(cos(comp_angle), -sin(comp_angle),0);
-        // Vec3 r_1  = Vec3(sin(comp_angle), cos(comp_angle),0);
-        
         for (auto j = i->courtyard.vertices.begin(); j != i->courtyard.vertices.end(); j++){
             j->first = j->first.rotate(comp_angle);
         }
@@ -120,13 +117,6 @@ void path_from_netlist(net_group_t * net_list, component_group_t * components){
         }
     }
 
-
-    // for(auto i = components->comp_arr.begin(); i != components->comp_arr.end(); i++){
-    //     Obstacle new_obstacle;
-    //     for(auto j = i->pads.begin(); j!= i->pads.end(); j++){
-    //         if(j->polygon_id == i->)
-    //         new_obstacle.center = i->            
-    //     } 
 
     plot_path_starts(paths, obstacles);
 }
