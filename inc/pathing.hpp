@@ -197,7 +197,7 @@ public:
 
     for(int x = -grid_spacing; x <= grid_spacing; x += grid_spacing){
       for (int y = -grid_spacing; y <= grid_spacing; y += grid_spacing){
-        if (x != 0 && y != 0){
+        if (!(x == 0 && y == 0)){
           node tmp = n.get_shifted_pos(x,y);
           // tmp.prev_node_pointer = n;
           if (n != start){
@@ -215,6 +215,7 @@ public:
           }
           
         // }
+        }
       }
     }
     return neighbors;
@@ -222,7 +223,6 @@ public:
     // for (auto i = node_tree.begin(); i != node_tree.end(); i++){
 
     // }
-    }
   }
 
 
