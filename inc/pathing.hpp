@@ -142,13 +142,30 @@ struct obstacle_group_t {
   ~obstacle_group_t() { obs_arr.clear(); }
 };
 struct node {
-  uint32_t prev_node_index;
+  node * prev_node_pointer;
   Vec3_int pos;
+  //todo: change definition here
+  Vec3_int prev_node_pos;
+  
+  node get_shifted_pos(int x, int y){
+    node new_node;
+    new_node.pos = pos + Vec3_int(x,y,0);
+    return new_node;
+  }
+
   node() {}
-  node(const node &n) : prev_node_index(n.prev_node_index), pos(n.pos) {}
+  node(const node &n) : prev_node_pointer(n.prev_node_pointer), pos(n.pos), prev_node_pos(n.prev_node_pos) {}
+  bool operator ==(const node &n) {
+    return (pos == n.pos); 
+  }
+  bool operator != (const node &n){
+    return !(pos == n.pos);
+  }
+  
   node operator=(const node &n) {
     if (this != &n) {
-      prev_node_index = n.prev_node_index;
+      prev_node_pointer = n.prev_node_pointer;
+      prev_node_pos = n.prev_node_pos;
       pos = n.pos;
     }
     return *this;
@@ -166,6 +183,48 @@ public:
 
   std::vector<node> node_tree;
   uint32_t num_nodes;
+
+  // todo:: add support for multiple end points
+  int get_cost(node point, node end){
+    return (abs(end.pos.x - point.pos.x) + abs(end.pos.y - point.pos.y));
+  }
+  int get_cost(Vec3_int point_pos, Vec3_int end_pos){
+    return (abs(end_pos.x - point_pos.x) + abs(end_pos.y - point_pos.y));
+  }
+
+  std::vector<node> get_neighbors(node n){
+    std::vector<node> neighbors(7);
+
+    for(int x = -grid_spacing; x <= grid_spacing; x += grid_spacing){
+      for (int y = -grid_spacing; y <= grid_spacing; y += grid_spacing){
+        if (x != 0 && y != 0){
+          node tmp = n.get_shifted_pos(x,y);
+          // tmp.prev_node_pointer = n;
+          if (n != start){
+            // check if previous node is defined (todo: figure out better behavior here) 
+            // if ( n->prev_node_pointer == nullptr){
+                // neighbors.push_back(tmp);
+            // } else{
+              if(tmp.pos != n.prev_node_pos){
+              // if (tmp != *n->prev_node_pointer){
+                neighbors.push_back(tmp);
+              }
+            // }
+          } else {
+            neighbors.push_back(tmp);
+          }
+          
+        // }
+      }
+    }
+    return neighbors;
+
+    // for (auto i = node_tree.begin(); i != node_tree.end(); i++){
+
+    // }
+    }
+  }
+
 
   Path() {}
 
@@ -186,10 +245,14 @@ public:
     return *this;
   }
 
+
   ~Path() {
     ends.clear();
     node_tree.clear();
   }
+  private:
+    int grid_spacing = 10000;
+
 };
 
 struct path_group_t {
@@ -199,6 +262,86 @@ struct path_group_t {
   path_group_t() {}
 
   ~path_group_t() { path_arr.clear(); }
+};
+
+// class Priority_Queue{
+//   public:
+//     std::priority_queue<int> queue;
+//     std::unordered_multimap<int, node> map;
+//     std::unordered_map<node, int> reverse_map;
+
+//     void add_to_queue(int c, node n){
+//       queue.push(c);
+//       map.insert(std::make_pair(c,n));
+//       reverse_map.insert(std::make_pair(n,c));
+//     }
+
+//     bool node_exists(node n){
+//       return (reverse_map.find(n) != reverse_map.end());
+//     }
+
+//     bool is_empty(void){
+//       return queue.empty();
+//     }
+
+//     void pop(void){
+//       int cost = queue.top();
+//       queue.pop();
+//       auto it = map.find(cost);
+//       reverse_map.erase(it->second);
+//     }
+
+//     Priority_Queue(){}
+//     ~Priority_Queue(){
+//       map.clear();
+//     }
+// }
+class Priority_Queue{
+  public:
+    // defining each node with node and its priority (smaller cost -> higher priority) in the queue
+    std::vector<std::pair<node, int>> nodes;
+
+    Priority_Queue(){}
+
+    bool is_empty(void){
+      return nodes.size() == 0;
+    }
+
+    void add_to_queue(node new_node, int cost){
+      // if (nodes.size() == 0){
+      //   return;
+      // }
+      for(auto i = nodes.begin(); i != nodes.end(); i++){
+        if (i->second > cost){
+          nodes.insert(i, std::make_pair(new_node,cost));
+          return;
+        }
+      }
+      nodes.push_back(std::make_pair(new_node,cost));
+      return;
+    };
+
+    //todo: improve here, removing elements beside vector.end is slow
+    void pop(){
+      nodes.erase(nodes.begin());
+    }
+
+    std::pair<node,int> top(){
+      return nodes[0];
+    }
+
+    // check if node is in queue
+    bool node_in_queue(node key){
+      for(auto i = nodes.begin(); i != nodes.end(); i++){
+        if (i->first == key){
+          return true;
+        }
+      }
+      return false;
+    };
+
+
+
 };
 
 void path_from_netlist(net_group_t *net_list, component_group_t *components);

@@ -1,5 +1,6 @@
 #include "pathing.hpp"
 #include "matplotlibcpp.h"
+#include <queue>
 
 #define PI 3.14159265
 #define TAU (2 * PI)
@@ -42,6 +43,70 @@ void plot_path_starts(path_group_t *paths, obstacle_group_t *obstacles) {
   plt::show();
 }
 
+// returns true if path connects to end goal, false otherwise
+bool a_star(Path * path, obstacle_group_t * obs){
+
+  Priority_Queue * queue = new Priority_Queue;
+
+  int cost = path->get_cost(path->start, path->ends[0]);
+  // todo: add support for multiple end points
+  queue->add_to_queue(path->start, cost);
+  // queue.push(node_with_cost(path->start, ));
+
+  std::vector<int> gscore;
+  gscore.push_back(0);
+  std::vector<int> fscore;
+  fscore.push_back(cost);
+
+  
+  path->node_tree.push_back(path->start);
+
+  while(!queue->is_empty()){
+    node current = queue->top().first;
+    if (current == path->ends[0]){
+      return true;
+    }
+    queue->pop();
+
+    int gscore_neighbor = INT32_MAX;
+    int fscore_neighbor = 0;
+    
+    std::vector<node> neighbors = path->get_neighbors(current);
+    node came_from_tmp;
+
+    for (auto n = neighbors.begin(); n != neighbors.end(); n++){
+      int tentative_gscore = gscore.back() + path->get_cost(current, *n);
+      if (tentative_gscore < gscore_neighbor){
+
+        gscore_neighbor = tentative_gscore;
+        fscore_neighbor = tentative_gscore + path->get_cost(n->pos,path->ends[0].pos);
+
+        int new_cost = path->get_cost(*n, path->ends[0]);
+        if (!(queue->node_in_queue(*n))){
+          queue->add_to_queue(*n, fscore_neighbor);
+        }
+      }
+    }
+    path->node_tree.push_back(came_from_tmp);
+
+  }
+
+  return false;
+}
+
+void pathing(path_group_t *paths, obstacle_group_t * obs){
+  for(int i = 0; i < paths->path_arr.size(); i++){
+  // for(auto i = paths->path_arr.begin(); i != paths->path_arr.end(); i++){
+    if(paths->path_arr[i].ends.size() > 0){
+      if (a_star(&(paths->path_arr[i]), obs)){
+        std::cout << "path found" << std::endl;
+      }
+    }
+  }
+
+}
+
+// convert netlist into lighter data structures
 void path_from_netlist(net_group_t *net_list, component_group_t *components) {
   // rumbling
   path_group_t *paths = new path_group_t;
@@ -65,7 +130,7 @@ void path_from_netlist(net_group_t *net_list, component_group_t *components) {
 
       node new_node;
       new_node.pos = pad_center_new;
-      new_node.prev_node_index = UINT32_MAX;
+      new_node.prev_node_pointer = nullptr;
       if (j == i->linked_conns_arr.begin()) {
         new_path.start = new_node;
       } else {
@@ -120,6 +185,6 @@ void path_from_netlist(net_group_t *net_list, component_group_t *components) {
       obstacles->obs_arr.push_back(new_obstacle);
     }
   }
-
+  pathing(paths, obstacles);
   plot_path_starts(paths, obstacles);
 }

@@ -50,6 +50,12 @@ struct Vec3_int {
   Vec3_int operator-(const Vec3_int &v) const {
     return Vec3_int(x - v.x, y - v.y, z - v.z);
   }
+  bool operator ==(const Vec3_int &v) const {
+    return (x==v.x && y==v.y && z ==v.z);
+  }
+  bool operator !=(const Vec3_int &v) const {
+    return !(x==v.x && y==v.y && z ==v.z);
+  }
 
   Vec3_int operator*(float d) const { return Vec3_int(x * d, y * d, z * d); }
   Vec3_int operator/(float d) const { return Vec3_int(x / d, y / d, z / d); }
