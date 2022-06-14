@@ -39,6 +39,8 @@ void plot_path_starts(path_group_t *paths, obstacle_group_t *obstacles) {
       y_path.push_back(j->pos.y);
     }
     plt::plot(x_path, y_path);
+    x_path.clear();
+    y_path.clear();
   }
   
   for (auto i = obstacles->obs_arr.begin(); i != obstacles->obs_arr.end();
@@ -49,7 +51,7 @@ void plot_path_starts(path_group_t *paths, obstacle_group_t *obstacles) {
     plt::plot(tmp_vecs.first, tmp_vecs.second);
   }
 
-  // plt::save("tmp2.png");
+  plt::save("out.png");
   plt::show();
 }
 
@@ -65,6 +67,7 @@ void retrace_path(Path *path, node n, std::vector<node> * mem){
   //   next = next->prev_node_pointer;
   // }
   // path->node_path.push_back(path->start);
+  mem->clear();
   std::reverse(path->node_path.begin(), path->node_path.end());
 }
 
