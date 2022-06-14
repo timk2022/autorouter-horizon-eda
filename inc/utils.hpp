@@ -305,5 +305,5 @@ void print_component_group(struct component_group_t *component_arr);
 void print_net_list(struct net_group_t *net_list);
 
 net_group_t *net_generation(component_group_t *components);
-void board_load_and_parse(component_group_t *comp_group,
-                          const std::string &filename);
+void board_load_and_parse(component_group_t *comp_group, const std::string &filename);
+double CLOCK(void);

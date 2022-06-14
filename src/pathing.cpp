@@ -132,12 +132,18 @@ bool a_star(Path * path, obstacle_group_t * obs){
 }
 
 void pathing(path_group_t *paths, obstacle_group_t * obs){
+  double start_time, end_time;
   for(int i = 0; i < paths->path_arr.size(); i++){
   // for(auto i = paths->path_arr.begin(); i != paths->path_arr.end(); i++){
     if(paths->path_arr[i].ends.size() > 0){
+      start_time = CLOCK();
       if (a_star(&(paths->path_arr[i]), obs)){
         std::cout << "path found" << std::endl;
+      } else {
+        std::cout << "no path found" << std::endl;
       }
+      end_time = CLOCK();
+      std::cout << "pathing took :" << end_time - start_time << " ms" << std::endl;
     }
   }
 
