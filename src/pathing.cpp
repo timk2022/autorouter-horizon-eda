@@ -106,8 +106,8 @@ bool a_star(Path * path, obstacle_group_t * obs){
       n->h = path->get_cost(*n, end_node);
       n->f = n->g + n->h;
       n->prev_node_pointer = current_addr;
-      if (n->g < max_cost || std::find(closed_list.begin(), closed_list.end(), *n) == closed_list.end()){
-        max_cost = n->g;
+      if (n->h < max_cost){// || std::find(closed_list.begin(), closed_list.end(), *n) == closed_list.end()){
+        max_cost = n->h;
         if (*n == path->ends[0]){
           retrace_path(path, *n, &mem);
           return true;
