@@ -1,6 +1,7 @@
 #pragma once
 #include "utils.hpp"
 
+#include <iostream>
 #include <vector>
 // todo: add type and component pointer?
 class Obstacle {
@@ -151,6 +152,7 @@ struct node {
   // costs
   int g;
   int f;
+  int h;
   //todo: change definition here
   // node parent_node;
   
@@ -161,7 +163,7 @@ struct node {
   }
 
   node() {}
-  node(const node &n) : prev_node_pointer(n.prev_node_pointer), pos(n.pos), parent_node(n.parent_node), g(n.g), f(n.f) {}
+  node(const node &n) : prev_node_pointer(n.prev_node_pointer), pos(n.pos), parent_node(n.parent_node), g(n.g), f(n.f), h(n.h) {}
   bool operator ==(const node &n) {
     return (pos == n.pos); 
   }
@@ -176,6 +178,7 @@ struct node {
       pos = n.pos;
       g = n.g;
       f = n.f;
+      h = n.h;
     }
     return *this;
   }
@@ -345,7 +348,8 @@ class Priority_Queue{
     bool node_in_queue(node key){
       for(auto i = nodes.begin(); i != nodes.end(); i++){
         if (i->first == key){
-          if (i->second > key.f){
+          if (i->second > key.h){
+            std::cout << "cheaper node found" << std::endl;
             nodes.erase(i);
             add_to_queue(key, key.f);
           }
