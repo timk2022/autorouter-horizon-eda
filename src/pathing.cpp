@@ -26,11 +26,21 @@ void plot_path_starts(path_group_t *paths, obstacle_group_t *obstacles) {
       y_ends.push_back(j->pos.y);
     }
   }
+
   plt::scatter(x, y);
   plt::scatter(x_ends, y_ends);
 
+  std::vector<int> x_path, y_path;
   // std::vector<std::vector<int>> x_tmp, y_tmp;
+  for (auto i = paths->path_arr.begin(); i != paths->path_arr.end(); i++) {
+    for(auto j = i->node_path.begin(); j != i->node_path.end(); j++){
 
+      x_path.push_back(j->pos.x);
+      y_path.push_back(j->pos.y);
+    }
+    plt::plot(x_path, y_path);
+  }
+  
   for (auto i = obstacles->obs_arr.begin(); i != obstacles->obs_arr.end();
        i++) {
     std::vector<int> x_tmp, y_tmp;
@@ -43,55 +53,124 @@ void plot_path_starts(path_group_t *paths, obstacle_group_t *obstacles) {
   plt::show();
 }
 
+
+void retrace_path(Path *path, node n, std::vector<node> * mem){
+  node next = *n.prev_node_pointer;
+  while(next != path->start || next.prev_node_pointer == nullptr){
+    path->node_path.push_back(next);
+    next = *next.prev_node_pointer;
+  }
+  path->node_path.push_back(path->start);
+  std::reverse(path->node_path.begin(), path->node_path.end());
+}
+
 // returns true if path connects to end goal, false otherwise
 bool a_star(Path * path, obstacle_group_t * obs){
 
   Priority_Queue * queue = new Priority_Queue;
+  node end_node = path->ends[0];
 
-  int cost = path->get_cost(path->start, path->ends[0]);
-  // todo: add support for multiple end points
+
+  int cost = path->get_cost(path->start,end_node);
+
+  path->start.g = 0;
+  path->start.f = cost;
+
+
+
   queue->add_to_queue(path->start, cost);
-  // queue.push(node_with_cost(path->start, ));
+  // path->node_path.push_back(path->start);
+  std::vector<node> closed_list;
 
-  std::vector<int> gscore;
-  gscore.push_back(0);
-  std::vector<int> fscore;
-  fscore.push_back(cost);
-
-  
-  path->node_tree.push_back(path->start);
+  std::vector<node> mem;
 
   while(!queue->is_empty()){
     node current = queue->top().first;
-    if (current == path->ends[0]){
+    int current_cost = queue->top().second;
+    
+    mem.push_back(current);
+
+    if(current == path->ends[0]){
+      retrace_path(path, current, &mem);
       return true;
     }
     queue->pop();
 
-    int gscore_neighbor = INT32_MAX;
-    int fscore_neighbor = 0;
-    
     std::vector<node> neighbors = path->get_neighbors(current);
-    node came_from_tmp;
+    int max_cost = INT32_MAX;
+    for(auto n = neighbors.begin(); n != neighbors.end(); n++){
+      n->g = current.g + path->get_cost(*n, current);
+      n->f = current.g + path->get_cost(*n, end_node);
+      n->prev_node_pointer = &mem.back();
+      if (*n == path->ends[0]){
+        retrace_path(path, *n, &mem);
+        return true;
+      }
+      if (!(queue->node_in_queue(*n))){
+        queue->add_to_queue(*n, path->get_cost(*n, end_node));
+      } 
 
-    for (auto n = neighbors.begin(); n != neighbors.end(); n++){
-      int tentative_gscore = gscore.back() + path->get_cost(current, *n);
-      if (tentative_gscore < gscore_neighbor){
+      if (std::find(closed_list.begin(), closed_list.end(), *n) == closed_list.end()){
+        closed_list.push_back(*n);
 
-        gscore_neighbor = tentative_gscore;
-        fscore_neighbor = tentative_gscore + path->get_cost(n->pos,path->ends[0].pos);
-
-        int new_cost = path->get_cost(*n, path->ends[0]);
-        if (!(queue->node_in_queue(*n))){
-          queue->add_to_queue(*n, fscore_neighbor);
-        }
       }
     }
-    path->node_tree.push_back(came_from_tmp);
+    
+    closed_list.push_back(current);
 
   }
-
   return false;
+
+
+
+
+  // Priority_Queue * queue = new Priority_Queue;
+
+  // int cost = path->get_cost(path->start, path->ends[0]);
+  // // todo: add support for multiple end points
+  // queue->add_to_queue(path->start, cost);
+  // // queue.push(node_with_cost(path->start, ));
+
+  // std::vector<int> gscore;
+  // gscore.push_back(0);
+  // std::vector<int> fscore;
+  // fscore.push_back(cost);
+
+  
+  // path->node_tree.push_back(path->start);
+
+  // while(!queue->is_empty()){
+  //   node current = queue->top().first;
+  //   if (current == path->ends[0]){
+  //     return true;
+  //   }
+  //   queue->pop();
+
+  //   int gscore_neighbor = INT32_MAX;
+  //   int fscore_neighbor = 0;
+    
+  //   std::vector<node> neighbors = path->get_neighbors(current);
+  //   node came_from_tmp;
+
+  //   for (auto n = neighbors.begin(); n != neighbors.end(); n++){
+  //     int tentative_gscore = gscore.back() + path->get_cost(current, *n);
+  //     if (tentative_gscore < gscore_neighbor){
+
+  //       gscore_neighbor = tentative_gscore;
+  //       fscore_neighbor = tentative_gscore + path->get_cost(n->pos,path->ends[0].pos);
+
+  //       int new_cost = path->get_cost(*n, path->ends[0]);
+  //       if (!(queue->node_in_queue(*n))){
+  //         queue->add_to_queue(*n, fscore_neighbor);
+  //       }
+  //     }
+  //   }
+  //   neighbors.clear();
+  //   path->node_tree.push_back(came_from_tmp);
+
+  // }
+
+  // return false;
 }
 
 void pathing(path_group_t *paths, obstacle_group_t * obs){

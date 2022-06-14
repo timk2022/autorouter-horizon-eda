@@ -141,11 +141,18 @@ struct obstacle_group_t {
 
   ~obstacle_group_t() { obs_arr.clear(); }
 };
+
+struct node;
+
 struct node {
   node * prev_node_pointer;
   Vec3_int pos;
+  Vec3_int parent_node;
+  // costs
+  int g;
+  int f;
   //todo: change definition here
-  Vec3_int prev_node_pos;
+  // node parent_node;
   
   node get_shifted_pos(int x, int y){
     node new_node;
@@ -154,7 +161,7 @@ struct node {
   }
 
   node() {}
-  node(const node &n) : prev_node_pointer(n.prev_node_pointer), pos(n.pos), prev_node_pos(n.prev_node_pos) {}
+  node(const node &n) : prev_node_pointer(n.prev_node_pointer), pos(n.pos), parent_node(n.parent_node), g(n.g), f(n.f) {}
   bool operator ==(const node &n) {
     return (pos == n.pos); 
   }
@@ -165,8 +172,10 @@ struct node {
   node operator=(const node &n) {
     if (this != &n) {
       prev_node_pointer = n.prev_node_pointer;
-      prev_node_pos = n.prev_node_pos;
+      parent_node = n.parent_node;
       pos = n.pos;
+      g = n.g;
+      f = n.f;
     }
     return *this;
   }
@@ -181,7 +190,7 @@ public:
   std::vector<node> ends;
   uint32_t num_ends;
 
-  std::vector<node> node_tree;
+  std::vector<node> node_path;
   uint32_t num_nodes;
 
   // todo:: add support for multiple end points
@@ -193,8 +202,8 @@ public:
   }
 
   std::vector<node> get_neighbors(node n){
-    std::vector<node> neighbors(7);
-
+    std::vector<node> neighbors;
+    neighbors.reserve(8);
     for(int x = -grid_spacing; x <= grid_spacing; x += grid_spacing){
       for (int y = -grid_spacing; y <= grid_spacing; y += grid_spacing){
         if (!(x == 0 && y == 0)){
@@ -205,12 +214,14 @@ public:
             // if ( n->prev_node_pointer == nullptr){
                 // neighbors.push_back(tmp);
             // } else{
-              if(tmp.pos != n.prev_node_pos){
+              if(tmp.pos != n.parent_node){
+                tmp.parent_node= n.pos;
               // if (tmp != *n->prev_node_pointer){
                 neighbors.push_back(tmp);
               }
             // }
           } else {
+            tmp.parent_node = start.pos;
             neighbors.push_back(tmp);
           }
           
@@ -230,7 +241,7 @@ public:
 
   Path(const Path &p)
       : start(p.start), ends(p.ends), num_ends(p.num_ends),
-        node_tree(p.node_tree), num_nodes(num_nodes) {}
+        node_path(p.node_path), num_nodes(num_nodes) {}
 
   Path operator=(const Path &p) {
     if (this != &p) {
@@ -239,7 +250,7 @@ public:
       ends = p.ends;
       num_ends = p.num_ends;
       // node_tree = p.node_tree;
-      node_tree = p.node_tree;
+      node_path = p.node_path;
       num_nodes = p.num_nodes;
     }
     return *this;
@@ -248,7 +259,7 @@ public:
 
   ~Path() {
     ends.clear();
-    node_tree.clear();
+    node_path.clear();
   }
   private:
     int grid_spacing = 10000;
@@ -330,10 +341,14 @@ class Priority_Queue{
       return nodes[0];
     }
 
-    // check if node is in queue
+    // check if node is in queue and replace if it is cheaper
     bool node_in_queue(node key){
       for(auto i = nodes.begin(); i != nodes.end(); i++){
         if (i->first == key){
+          if (i->second > key.f){
+            nodes.erase(i);
+            add_to_queue(key, key.f);
+          }
           return true;
         }
       }
